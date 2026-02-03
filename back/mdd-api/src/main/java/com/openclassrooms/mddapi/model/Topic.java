@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "topics")
 @Getter
@@ -16,10 +19,9 @@ public class Topic {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(nullable = false, unique = true)
     private String name;
 
-    public Topic(String name) {
-        this.name = name;
-    }
+    @ManyToMany(mappedBy = "subscriptions")
+    private Set<User> subscribers = new HashSet<>();
 }
