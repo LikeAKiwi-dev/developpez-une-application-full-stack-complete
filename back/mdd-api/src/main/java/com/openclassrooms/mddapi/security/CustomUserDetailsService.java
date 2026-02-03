@@ -2,7 +2,8 @@ package com.openclassrooms.mddapi.security;
 
 import com.openclassrooms.mddapi.model.User;
 import com.openclassrooms.mddapi.repository.UserRepository;
-import org.jspecify.annotations.NonNull;
+import org.springframework.lang.NonNull;
+
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +12,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    public CustomUserDetailsService(UserRepository userRepository) {
+    public CustomUserDetailsService(UserRepository userRepository) throws UsernameNotFoundException {
         this.userRepository = userRepository;
     }
 

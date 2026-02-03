@@ -1,9 +1,15 @@
 package com.openclassrooms.mddapi.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "topics")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Topic {
 
     @Id
@@ -13,13 +19,7 @@ public class Topic {
     @Column(nullable = false, unique = true, length = 100)
     private String name;
 
-    public Topic() {}
-
     public Topic(String name) {
         this.name = name;
     }
-
-    public Long getId() { return id; }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
 }
