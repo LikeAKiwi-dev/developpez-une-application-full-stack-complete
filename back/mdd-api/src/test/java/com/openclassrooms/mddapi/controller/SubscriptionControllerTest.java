@@ -1,36 +1,57 @@
 package com.openclassrooms.mddapi.controller;
 
-import com.openclassrooms.mddapi.repository.TopicRepository;
-import com.openclassrooms.mddapi.repository.UserRepository;
+import com.openclassrooms.mddapi.service.SubscriptionService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.RequestBuilder;
-import org.springframework.test.web.servlet.ResultMatcher;
 
-import static org.springframework.http.RequestEntity.post;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
+import static org.mockito.Mockito.verify;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+import org.springframework.security.test.context.support.WithMockUser;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@WebMvcTest(SubscriptionController.class)
 class SubscriptionControllerTest {
 
     @Autowired
-    MockMvc mockMvc;
-    @Autowired
-    UserRepository userRepository;
-    @Autowired
-    TopicRepository topicRepository;
+    private MockMvc mockMvc;
+
+    @MockitoBean
+    private SubscriptionService subscriptionService;
+
+    @Test
+    void subscribe_shouldReturn401_whenNotAuthenticated() throws Exception {
+        mockMvc.perform(post("/api/subscriptions/{topicId}", 1L).with(csrf()))
+                .andExpect(status().isUnauthorized());
+    }
 
     @Test
     @WithMockUser(username = "test")
-    void subscribe_shouldReturn200() throws Exception {
-        mockMvc.perform((RequestBuilder) post("/api/subscriptions/{id}", 1L))
-                .andExpect(status().isOk())
-                .andExpect((ResultMatcher) jsonPath("$.message").value("Subscribed"));
+    void subscribe_shouldCallService_whenAuthenticated() throws Exception {
+        mockMvc.perform(post("/api/subscriptions/{topicId}", 1L).with(csrf()))
+                .andExpect(status().isOk());
+
+        verify(subscriptionService).subscribe("test", 1L);
+    }
+
+    @Test
+    void unsubscribe_shouldReturn401_whenNotAuthenticated() throws Exception {
+        mockMvc.perform(delete("/api/subscriptions/{topicId}", 1L).with(csrf()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = "test")
+    void unsubscribe_shouldCallService_whenAuthenticated() throws Exception {
+        mockMvc.perform(delete("/api/subscriptions/{topicId}", 1L).with(csrf()))
+                .andExpect(status().isOk());
+
+        verify(subscriptionService).unsubscribe("test", 1L);
     }
 }

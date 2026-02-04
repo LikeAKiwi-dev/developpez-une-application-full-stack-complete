@@ -4,6 +4,7 @@ import com.openclassrooms.mddapi.model.Topic;
 import com.openclassrooms.mddapi.repository.TopicRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,16 +26,19 @@ class TopicControllerIntegrationTest {
     private TopicRepository topicRepository;
 
     @BeforeEach
-    void clean() {
+    void setUp() {
         topicRepository.deleteAll();
+
+        Topic t = new Topic();
+        t.setName("Java");
+        topicRepository.save(t);
     }
 
     @Test
     void shouldReturnTopics() throws Exception {
-        topicRepository.save(new Topic("Angular"));
-
         mockMvc.perform(get("/api/topics"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Angular"));
+                .andExpect(content().contentTypeCompatibleWith("application/json"))
+                .andExpect(jsonPath("$[0].name").value("Java"));
     }
 }
