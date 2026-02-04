@@ -12,12 +12,12 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    public CustomUserDetailsService(UserRepository userRepository) throws UsernameNotFoundException {
+    public CustomUserDetailsService(UserRepository userRepository){
         this.userRepository = userRepository;
     }
 
     @Override
-    public UserDetails loadUserByUsername(@NonNull String login) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(@NonNull String login){
         User user = userRepository.findByEmailOrUsername(login, login)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
