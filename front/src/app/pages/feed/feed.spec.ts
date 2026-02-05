@@ -1,23 +1,30 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { of } from 'rxjs';
+import { FeedComponent } from './feed';
+import { FeedService } from '../../services/feed.service';
+import { provideRouter } from '@angular/router';
 
-import { Feed } from './feed';
-
-describe('Feed', () => {
-  let component: Feed;
-  let fixture: ComponentFixture<Feed>;
+describe('FeedComponent', () => {
+  const feedServiceMock = {
+    getFeed: vi.fn(() => of([])),
+  };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Feed]
-    })
-    .compileComponents();
+      imports: [FeedComponent],
+      providers: [
+        provideRouter([]),
+        { provide: FeedService, useValue: feedServiceMock },
+      ],
+    }).compileComponents();
 
-    fixture = TestBed.createComponent(Feed);
-    component = fixture.componentInstance;
-    await fixture.whenStable();
+    vi.clearAllMocks();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('should load feed', () => {
+    const fixture = TestBed.createComponent(FeedComponent);
+    fixture.detectChanges();
+    expect(feedServiceMock.getFeed).toHaveBeenCalled();
   });
 });
