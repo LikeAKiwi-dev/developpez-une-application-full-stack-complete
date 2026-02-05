@@ -1,0 +1,19 @@
+<h2>Login</h2>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <div>
+    <label>Login</label>
+    <input formControlName="login" />
+  </div>
+
+  <div>
+    <label>Password</label>
+    <input type="password" formControlName="password" />
+  </div>
+
+  <button type="submit">Se connecter</button>
+</form>
+
+@if (error) {
+  <p style="color:red">{{ error }}</p>
+}

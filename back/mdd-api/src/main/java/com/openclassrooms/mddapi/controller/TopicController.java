@@ -1,6 +1,7 @@
 package com.openclassrooms.mddapi.controller;
 
-import com.openclassrooms.mddapi.model.Topic;
+import com.openclassrooms.mddapi.dto.TopicResponse;
+import com.openclassrooms.mddapi.dto.UserDto;
 import com.openclassrooms.mddapi.service.TopicService;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +18,17 @@ public class TopicController {
     }
 
     @GetMapping
-    public List<Topic> getAll() {
-        return topicService.findAll();
+    public List<TopicResponse> getAll() {
+        return topicService.findAll()
+                .stream()
+                .map(t -> new TopicResponse(
+                        t.getId(),
+                        t.getName(),
+                        t.getSubscribers()
+                                .stream()
+                                .map(u -> new UserDto(u.getId(), u.getUsername()))
+                                .toList()
+                ))
+                .toList();
     }
 }

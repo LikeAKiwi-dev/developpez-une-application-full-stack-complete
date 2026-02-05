@@ -1,9 +1,35 @@
-<h2>Thèmes (version simple pour test e2e)</h2>
-<div>
-  <ul>
-    @for (t of topics; track t.id) {
-      <li>{{ t.name }}</li>
-    }
-  </ul>
-</div>
+<h2>Topics</h2>
 
+<nav>
+
+  @if (currentUser) {
+    <a routerLink="/feed">Feed</a> |
+    <a routerLink="/posts/new">Créer un post</a> |
+    <a href="#" (click)="logOut(); $event.preventDefault()">Log out</a>
+  }@else{
+    <a routerLink="/login">Login</a>
+  }
+
+</nav>
+
+@if (successMsg) {
+  <p style="color:green">{{ successMsg }}</p>
+}
+
+@if (error) {
+  <p style="color:red">{{ error }}</p>
+}
+
+<ul>
+  @for (t of topics; track t.id) {
+    <li>
+      {{ t.name }}
+
+      @if (!isSubscribed(t)) {
+        <button (click)="subscribe(t.id)">S’abonner</button>
+      } @else {
+        <button (click)="unsubscribe(t.id)">Se désabonner</button>
+      }
+    </li>
+  }
+</ul>

@@ -1,0 +1,15 @@
+<h2>Fil d’actualité</h2>
+<a routerLink="/posts/new">Créer un post</a>
+
+@if (error) {
+  <p style="color:red">{{ error }}</p>
+}
+
+<ul>
+  @for ( p of posts ; track p.id) {
+    <li>
+      <a [routerLink]="['/posts', p.id]">{{ p.title }}</a>
+      — {{ p.topic.name }} — {{ p.authorUsername }}
+    </li>
+  }
+</ul>

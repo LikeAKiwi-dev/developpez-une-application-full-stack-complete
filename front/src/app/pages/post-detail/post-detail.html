@@ -1,0 +1,28 @@
+@if (error) {
+  <p style="color:red">{{ error }}</p>
+}
+
+@if (data) {
+  <div>
+    <h2>{{ data.post.title }}</h2>
+    <p>{{ data.post.content }}</p>
+    <p><small>{{ data.post.topic.name }} — {{ data.post.authorUsername }} — {{ data.post.createdAt }}</small></p>
+
+    <h3>Commentaires</h3>
+    <ul>
+      @for (c of data.comments; track c.id){
+        <li>
+          {{ c.content }} — <small>{{ c.authorUsername }} — {{ c.createdAt }}</small>
+        </li>
+      }
+
+    </ul>
+
+    <h4>Ajouter un commentaire</h4>
+    <form [formGroup]="commentForm" (ngSubmit)="addComment()">
+      <textarea formControlName="content"></textarea>
+      <button type="submit">Envoyer</button>
+    </form>
+  </div>
+}
+

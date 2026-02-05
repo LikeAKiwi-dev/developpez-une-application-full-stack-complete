@@ -1,31 +1,88 @@
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
+import { Component, DestroyRef, inject } from '@angular/core';
 import { TopicService } from '../../services/topic.service';
+import { SubscriptionService } from '../../services/subscription.service';
+import { UserService, User } from '../../services/user.service';
 import { Topic } from '../../models/topic.model';
-import {finalize} from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import {RouterLink} from '@angular/router';
+import {AuthService} from '../../services/auth.service';
 
 @Component({
   selector: 'app-topics',
   standalone: true,
-  imports: [CommonModule],
   templateUrl: './topics.html',
-  styleUrl: './topics.scss',
+  imports: [
+    RouterLink
+  ]
 })
-export class TopicsComponent implements OnInit {
+export class TopicsComponent {
   topics: Topic[] = [];
+  currentUser!: User;
   error = '';
+  successMsg = '';
 
-  private readonly destroyRef = inject(DestroyRef);
+  private destroyRef = inject(DestroyRef);
 
-  constructor(private topicService: TopicService) {}
+  constructor(
+    private topicService: TopicService,
+    private subscriptionService: SubscriptionService,
+    private userService: UserService,
+    private authService: AuthService
+  ) {
+    this.load();
+  }
 
-  ngOnInit(): void {
+  private load(): void {
+    this.userService.me()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: user => {
+          this.currentUser = user;
+          this.loadTopics();
+        },
+        error: () => this.error = 'Utilisateur non connecté',
+      });
+  }
+
+  private loadTopics(): void {
     this.topicService.getAll()
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe((data: Topic[]) => this.topics = data);
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: topics => this.topics = topics,
+        error: () => this.error = 'Impossible de charger les topics',
+      });
+  }
+
+  isSubscribed(topic: Topic): boolean {
+    return topic.subscribers.some(s => s.username === this.currentUser.username);
+  }
+
+  subscribe(topicId: number): void {
+    this.subscriptionService.subscribe(topicId).subscribe({
+      next: () => {
+        this.successMsg = 'Abonnement effectué';
+        this.loadTopics();
+      },
+      error: () => this.error = 'Impossible de s’abonner',
+    });
+  }
+
+  unsubscribe(topicId: number): void {
+    this.subscriptionService.unsubscribe(topicId).subscribe({
+      next: () => {
+        this.successMsg = 'Désabonnement effectué';
+        this.loadTopics();
+      },
+      error: () => this.error = 'Impossible de se désabonner',
+    });
+  }
+
+  protected logOut() {
+    this.authService.logout().subscribe({
+      next: () => {
+        this.successMsg = 'Déconnection effectuer';
+      },
+      error: () => this.error = 'Une erreur est survenue',
+    });
   }
 }

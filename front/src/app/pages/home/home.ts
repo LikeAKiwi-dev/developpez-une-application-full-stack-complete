@@ -14,6 +14,6 @@ export class Home implements OnInit {
   ngOnInit(): void {}
 
   start() {
-    this.router.navigate(['/topics']);
+    this.router.navigate(['/login']);
   }
 }
