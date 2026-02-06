@@ -11,6 +11,6 @@ export class FeedService {
   constructor(private http: HttpClient) {}
 
   getFeed(): Observable<PostDto[]> {
-    return this.http.get<PostDto[]>(this.url);
+    return this.http.get<PostDto[]>(this.url, { withCredentials: true });
   }
 }

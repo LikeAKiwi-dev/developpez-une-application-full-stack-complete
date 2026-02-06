@@ -15,15 +15,15 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   login(payload: LoginRequest): Observable<void> {
-    return this.http.post<void>(`${this.url}/login`, payload);
+    return this.http.post<void>(`${this.url}/login`, payload, { withCredentials: true });
   }
 
   logout(): Observable<void> {
-    return this.http.post<void>(`${this.url}/logout`, {});
+    return this.http.post<void>(`${this.url}/logout`, {}, { withCredentials: true });
   }
 
   isLoggedIn(): Observable<boolean> {
-    return this.http.get(`${environment.apiUrl}/users/me`).pipe(
+    return this.http.get(`${environment.apiUrl}/users/me`, { withCredentials: true }).pipe(
       map(() => true),
       catchError(() => of(false))
     );

@@ -46,11 +46,16 @@ describe('PostCreateComponent', () => {
 
   it('should create post and navigate to feed on success', () => {
     const fixture = TestBed.createComponent(PostCreateComponent);
-    const component = fixture.componentInstance as any;
+    const component = fixture.componentInstance;
 
     fixture.detectChanges();
 
-    component.form.setValue({ title: 'Post', content: 'Contenu', topicId: 1 });
+    component.form.setValue({
+      title: 'Post',
+      content: 'Contenu',
+      topicId: 1,
+    });
+
     component.submit();
 
     expect(postServiceMock.create).toHaveBeenCalledWith({
@@ -63,18 +68,26 @@ describe('PostCreateComponent', () => {
   });
 
   it('should set error on create failure', () => {
-    postServiceMock.create.mockReturnValue(throwError(() => new Error('boom')));
+    postServiceMock.create.mockReturnValue(
+      throwError(() => new Error('boom'))
+    );
 
     const fixture = TestBed.createComponent(PostCreateComponent);
-    const component = fixture.componentInstance as any;
+    const component = fixture.componentInstance;
 
     fixture.detectChanges();
 
-    component.form.setValue({ title: 'Post', content: 'Contenu', topicId: 1 });
+    component.form.setValue({
+      title: 'Post',
+      content: 'Contenu',
+      topicId: 1,
+    });
+
     component.submit();
 
     expect(component.error).toContain('Création impossible');
   });
+
 
   it('should create component', () => {
     const fixture = TestBed.createComponent(PostCreateComponent);

@@ -11,6 +11,6 @@ export class TopicService {
   constructor(private http: HttpClient) {}
 
   getAll(): Observable<Topic[]> {
-    return this.http.get<Topic[]>(this.url);
+    return this.http.get<Topic[]>(this.url, { withCredentials: true });
   }
 }

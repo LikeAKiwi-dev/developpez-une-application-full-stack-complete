@@ -1,17 +1,17 @@
 <h2>Login</h2>
 
-<form [formGroup]="form" (ngSubmit)="submit()">
+<form [formGroup]="form" (ngSubmit)="submit()" data-cy="login-form">
   <div>
     <label>Login</label>
-    <input formControlName="login" />
+    <input formControlName="login" data-cy="login-input" />
   </div>
 
   <div>
     <label>Password</label>
-    <input type="password" formControlName="password" />
+    <input type="password" formControlName="password"  data-cy="password-input" />
   </div>
 
-  <button type="submit">Se connecter</button>
+  <button type="submit" data-cy="login-submit">Se connecter</button>
 </form>
 
 @if (error) {

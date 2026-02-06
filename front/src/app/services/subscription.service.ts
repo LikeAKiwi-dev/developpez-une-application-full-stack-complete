@@ -10,10 +10,10 @@ export class SubscriptionService {
   constructor(private http: HttpClient) {}
 
   subscribe(topicId: number): Observable<void> {
-    return this.http.post<void>(`${this.url}/${topicId}`, {});
+    return this.http.post<void>(`${this.url}/${topicId}`, {}, { withCredentials: true });
   }
 
   unsubscribe(topicId: number): Observable<void> {
-    return this.http.delete<void>(`${this.url}/${topicId}`);
+    return this.http.delete<void>(`${this.url}/${topicId}`, { withCredentials: true });
   }
 }
