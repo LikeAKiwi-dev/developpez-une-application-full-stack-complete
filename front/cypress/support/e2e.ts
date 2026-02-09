@@ -17,8 +17,19 @@ Cypress.Commands.add('apiLogin', (login: string, password: string) => {
     failOnStatusCode: false,
   }).then((res) => {
     expect([200, 401, 403]).to.include(res.status);
+
+    if (res.status === 200 && res.body?.token) {
+      const token = res.body.token as string;
+
+      cy.visit('/');
+      cy.window().then((win) => {
+        win.localStorage.setItem('token', token);
+      });
+      cy.reload();
+    }
   });
 });
+
 
 declare global {
   namespace Cypress {

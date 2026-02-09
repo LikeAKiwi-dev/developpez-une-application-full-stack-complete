@@ -1,7 +1,15 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 
 export const apiCredentialsInterceptor: HttpInterceptorFn = (req, next) => {
-  // Code provisoire en attendant de crée ola securité coté back avec JWT
-  const cloned = req.clone({ withCredentials: true });
-  return next(cloned);
+  const token = localStorage.getItem('token');
+
+  if (!token || req.url.includes('/api/auth')) {
+    return next(req);
+  }
+
+  return next(
+    req.clone({
+      setHeaders: { Authorization: `Bearer ${token}` },
+    })
+  );
 };

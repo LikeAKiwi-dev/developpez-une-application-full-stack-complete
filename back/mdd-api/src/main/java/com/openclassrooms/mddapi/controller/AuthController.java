@@ -4,17 +4,13 @@ import com.openclassrooms.mddapi.dto.LoginRequest;
 import com.openclassrooms.mddapi.dto.RegisterRequest;
 import com.openclassrooms.mddapi.model.User;
 import com.openclassrooms.mddapi.repository.UserRepository;
+import com.openclassrooms.mddapi.security.jwt.JwtService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 
 import java.util.Map;
 
@@ -25,21 +21,28 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     public AuthController(
             AuthenticationManager authenticationManager,
             UserRepository userRepository,
-            PasswordEncoder passwordEncoder)
-    {
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService
+    ) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
-        if (userRepository.existsByEmail(req.email)) return ResponseEntity.badRequest().body("Email already used");
-        if (userRepository.existsByUsername(req.username)) return ResponseEntity.badRequest().body("Username already used");
+        if (userRepository.existsByEmail(req.email)) {
+            return ResponseEntity.badRequest().body("Email already used");
+        }
+        if (userRepository.existsByUsername(req.username)) {
+            return ResponseEntity.badRequest().body("Username already used");
+        }
 
         User u = new User();
         u.setEmail(req.email);
@@ -53,29 +56,21 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest req, HttpServletRequest request) {
-        Authentication auth = authenticationManager.authenticate(
+    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest req) {
+        Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(req.login, req.password)
         );
 
-        SecurityContextHolder.getContext().setAuthentication(auth);
-
-        HttpSession session = request.getSession(true);
-        session.setAttribute(
-                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-                SecurityContextHolder.getContext()
-        );
+        String token = jwtService.generateToken(authentication.getName());
 
         return ResponseEntity.ok(Map.of(
+                "token", token,
                 "message", "Successful login"
         ));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Map<String, String>> logout(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session != null) session.invalidate();
-        SecurityContextHolder.clearContext();
+    public ResponseEntity<Map<String, String>> logout() {
         return ResponseEntity.ok(Map.of(
                 "message", "Successful logout"
         ));

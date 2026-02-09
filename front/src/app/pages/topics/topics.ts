@@ -79,10 +79,9 @@ export class TopicsComponent {
 
   protected logOut() {
     this.authService.logout().subscribe({
-      next: () => {
-        this.successMsg = 'Déconnection effectuer';
-      },
+      next: () => window.location.href = '/login',
       error: () => this.error = 'Une erreur est survenue',
     });
   }
+
 }

@@ -21,14 +21,14 @@ export class PostService {
   constructor(private http: HttpClient) {}
 
   create(payload: CreatePostRequest): Observable<PostDto> {
-    return this.http.post<PostDto>(this.url, payload, { withCredentials: true });
+    return this.http.post<PostDto>(this.url, payload);
   }
 
   getById(id: number): Observable<PostDetailResponse> {
-    return this.http.get<PostDetailResponse>(`${this.url}/${id}`, { withCredentials: true });
+    return this.http.get<PostDetailResponse>(`${this.url}/${id}`);
   }
 
   addComment(postId: number, payload: CreateCommentRequest) {
-    return this.http.post(`${this.url}/${postId}/comments`, payload, { withCredentials: true });
+    return this.http.post(`${this.url}/${postId}/comments`, payload);
   }
 }

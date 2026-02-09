@@ -13,6 +13,6 @@ export class UserService {
   constructor(private http: HttpClient) {}
 
   me(): Observable<User> {
-    return this.http.get<User>(`${environment.apiUrl}/users/me`, { withCredentials: true });
+    return this.http.get<User>(`${environment.apiUrl}/users/me`);
   }
 }
