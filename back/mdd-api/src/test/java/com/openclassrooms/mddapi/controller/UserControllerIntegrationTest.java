@@ -19,8 +19,8 @@ class UserControllerIntegrationTest {
     private MockMvc mockMvc;
 
     @Test
-    void shouldReturn403WhenNotAuthenticated() throws Exception {
+    void shouldReturn401WhenNotAuthenticated() throws Exception {
         mockMvc.perform(get("/api/users/me"))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 }

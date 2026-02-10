@@ -1,17 +1,23 @@
 package com.openclassrooms.mddapi.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassrooms.mddapi.model.Topic;
 import com.openclassrooms.mddapi.repository.TopicRepository;
+import com.openclassrooms.mddapi.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -25,6 +31,12 @@ class TopicControllerIntegrationTest {
     @Autowired
     private TopicRepository topicRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @BeforeEach
     void setUp() {
         topicRepository.deleteAll();
@@ -34,9 +46,34 @@ class TopicControllerIntegrationTest {
         topicRepository.save(t);
     }
 
+    private String loginAndGetToken() throws Exception {
+        userRepository.deleteAll();
+
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"username":"test","email":"test@test.com","password":"Password123!"}
+                                """))
+                .andExpect(status().isOk());
+
+        MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"login":"test","password":"Password123!"}
+                                """))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        JsonNode json = objectMapper.readTree(loginResult.getResponse().getContentAsString());
+        return json.get("token").asText();
+    }
+
     @Test
     void shouldReturnTopics() throws Exception {
-        mockMvc.perform(get("/api/topics"))
+        String token = loginAndGetToken();
+
+        mockMvc.perform(get("/api/topics")
+                        .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith("application/json"))
                 .andExpect(jsonPath("$[0].name").value("Java"));

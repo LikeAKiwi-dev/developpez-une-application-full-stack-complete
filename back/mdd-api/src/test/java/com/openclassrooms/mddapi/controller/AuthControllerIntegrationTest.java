@@ -1,14 +1,15 @@
 package com.openclassrooms.mddapi.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.openclassrooms.mddapi.dto.LoginRequest;
 import com.openclassrooms.mddapi.dto.RegisterRequest;
+import com.openclassrooms.mddapi.repository.UserRepository;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -27,6 +28,9 @@ class AuthControllerIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
     void shouldRegisterUser() throws Exception {
@@ -89,36 +93,29 @@ class AuthControllerIntegrationTest {
     }
 
     @Test
-    void shouldLoginWithEmailAndThenAccessMeEndpoint() throws Exception {
-        // Register
-        RegisterRequest register = new RegisterRequest();
-        register.setUsername("loginuser");
-        register.setEmail("login@test.com");
-        register.setPassword("password");
+    void shouldLoginAndAccessMeWithJwt() throws Exception {
+        userRepository.deleteAll();
 
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(register)))
+                        .content("""
+                                {"username":"test","email":"test@test.com","password":"Password123!"}
+                                """))
                 .andExpect(status().isOk());
-
-        // Login with email (field = login)
-        LoginRequest login = new LoginRequest();
-        login.setLogin("login@test.com");
-        login.setPassword("password");
 
         MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(login)))
+                        .content("""
+                                {"login":"test","password":"Password123!"}
+                                """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Successful login"))
                 .andReturn();
 
-        MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession(false);
+        JsonNode json = objectMapper.readTree(loginResult.getResponse().getContentAsString());
+        String token = json.get("token").asText();
 
-        // Check session is active
-        mockMvc.perform(get("/api/users/me").session(session))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Session active"))
-                .andExpect(jsonPath("$.username").value("loginuser"));
+        mockMvc.perform(get("/api/users/me")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
     }
 }
