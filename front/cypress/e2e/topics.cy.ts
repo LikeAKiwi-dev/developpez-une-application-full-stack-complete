@@ -1,13 +1,15 @@
 /// <reference types="cypress" />
 
 describe('Topics', () => {
+  const login = 'test';
+  const password = 'Password123!';
+
+  beforeEach(() => {
+    cy.apiRegisterIfNeeded(login, password);
+    cy.apiLogin(login, password);
+  });
+
   it('Displays the list of topics from the database via the back', () => {
-
-    cy.intercept('GET', '**/api/users/me', {
-      statusCode: 200,
-      body: { id: 1, username: 'test' },
-    }).as('me');
-
     cy.intercept('GET', '**/api/topics').as('getTopicsApi');
 
     cy.visit('/topics');

@@ -1,14 +1,23 @@
 /// <reference types="cypress" />
+interface LoginResponse {
+  token?: string;
+  accessToken?: string;
+  jwt?: string;
+  data?: {
+    token?: string;
+    accessToken?: string;
+  };
+  message?: string;
+}
 
 Cypress.Commands.add('apiRegisterIfNeeded', (login: string, password: string) => {
   cy.request({
     method: 'POST',
     url: 'http://localhost:8080/api/auth/register',
     body: { email: `${login}@test.local`, username: login, password },
-    failOnStatusCode: false,
+    failOnStatusCode: false, // 200 ou 400 si déjà existant
   });
 });
-
 Cypress.Commands.add('apiLogin', (login: string, password: string) => {
   cy.request({
     method: 'POST',
@@ -16,20 +25,29 @@ Cypress.Commands.add('apiLogin', (login: string, password: string) => {
     body: { login, password },
     failOnStatusCode: false,
   }).then((res) => {
-    expect([200, 401, 403]).to.include(res.status);
+    expect(res.status).to.eq(200);
 
-    if (res.status === 200 && res.body?.token) {
-      const token = res.body.token as string;
+    const body: LoginResponse = res.body ?? {};
 
-      cy.visit('/');
-      cy.window().then((win) => {
-        win.localStorage.setItem('token', token);
-      });
-      cy.reload();
-    }
+    const token =
+      body.token ??
+      body.accessToken ??
+      body.jwt ??
+      body.data?.token ??
+      body.data?.accessToken;
+
+    expect(token, `Login response must contain a token. Response body: ${JSON.stringify(body)}`).to.be.a('string');
+
+    Cypress.env('token', token);
+
+    cy.visit('/', {
+      onBeforeLoad(win) {
+        const windowRef = win as unknown as Window;
+        windowRef.localStorage.setItem('token', token as string);
+      },
+    });
   });
 });
-
 
 declare global {
   namespace Cypress {

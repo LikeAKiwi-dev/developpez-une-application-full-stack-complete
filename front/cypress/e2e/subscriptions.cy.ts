@@ -10,22 +10,24 @@ describe('Subscribe (Topics)', () => {
   });
 
   it("'Unsubscribe' poster on a topic to which I am subscribed (forced state)", () => {
-    cy.request({
+    cy.request<Array<{ id: number; name: string }>>({
       method: 'GET',
       url: 'http://localhost:8080/api/topics',
+      headers: { Authorization: `Bearer ${Cypress.env('token')}` },
       failOnStatusCode: false,
     }).then((res) => {
       expect(res.status).to.eq(200);
 
-      const topics = res.body as Array<{ id: number; name: string }>;
+      const topics = res.body;
       expect(topics.length).to.be.greaterThan(0);
 
       const topicId = topics[0].id;
       const topicName = topics[0].name;
 
-      cy.request({
+      cy.request<void>({
         method: 'POST',
         url: `http://localhost:8080/api/subscriptions/${topicId}`,
+        headers: { Authorization: `Bearer ${Cypress.env('token')}` },
         failOnStatusCode: false,
       }).then((subRes) => {
         expect([200, 201, 204, 409]).to.include(subRes.status);
@@ -36,7 +38,9 @@ describe('Subscribe (Topics)', () => {
 
         cy.contains('li', topicName)
           .should('be.visible')
-          .within(() => cy.contains(/se désabonner/i).should('be.visible'));
+          .within(() => {
+            cy.contains(/se désabonner/i).should('be.visible');
+          });
       });
     });
   });
@@ -53,11 +57,14 @@ describe('Subscribe (Topics)', () => {
     cy.get('li').first().as('firstTopic');
 
     cy.get('@firstTopic').within(() => {
-      cy.get('button').then(($btn) => {
-        const label = ($btn.text() || '').toLowerCase();
+      cy.get('button').then(($btn: JQuery<HTMLElement>) => {
+        const label: string = ($btn.text() || '').toLowerCase();
 
         cy.wrap($btn).click();
-        cy.wait('@toggleSub').its('response.statusCode').should('be.oneOf', [200, 201, 204, 409]);
+
+        cy.wait('@toggleSub')
+          .its('response.statusCode')
+          .should('be.oneOf', [200, 201, 204, 409]);
 
         if (label.includes('désabonn')) {
           cy.contains(/s[’']abonner|abonner/i).should('be.visible');
@@ -80,18 +87,17 @@ describe('Subscribe (Topics)', () => {
         subscribers?: Array<{ id: number; username: string }>;
       }>;
 
-      const subscribedNames = body
+      const subscribedNames: string[] = body
         .filter((t) => (t.subscribers ?? []).some((s) => s.username === login))
         .map((t) => t.name);
 
-      cy.get('body').then(($body) => {
-        const $btn = $body
+      cy.get('body').then(($body: JQuery<HTMLElement>) => {
+        const $btn: JQuery<HTMLElement> = $body
           .find('button')
-          .filter((_, el) =>
-            /mes abonn|abonnés uniquement|abonnements|abonnés/i.test(
-              (el.textContent ?? '').toLowerCase()
-            )
-          );
+          .filter((_index: number, el: HTMLElement) => {
+            const txt = (el.textContent ?? '').toLowerCase();
+            return txt.includes('mes abonn'); // couvre "mes abonnements" / "mes abonnés"
+          });
 
         if (!$btn.length) {
           cy.log('No "my subscriptions" filter present in the UI → test skipped.');
@@ -100,14 +106,14 @@ describe('Subscribe (Topics)', () => {
 
         cy.wrap($btn.first()).click();
 
-        cy.get('li').each(($li) => {
-          const liText = $li.text();
-          const match = subscribedNames.some((name) => liText.includes(name));
+        cy.get('li').each(($li: JQuery<HTMLElement>) => {
+          const liText: string = $li.text();
+          const match: boolean = subscribedNames.some((name: string) => liText.includes(name));
           expect(match, `topic affiché doit être abonné: "${liText}"`).to.eq(true);
         });
 
         if (subscribedNames.length > 0) {
-          cy.get('li').each(($li) => {
+          cy.get('li').each(($li: JQuery<HTMLElement>) => {
             cy.wrap($li).contains(/se désabonner|désabonn/i).should('be.visible');
           });
         }
