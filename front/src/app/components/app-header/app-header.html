@@ -1,0 +1,33 @@
+@if (showHeader) {
+  <header class="topbar">
+    <a class="logo" routerLink="/" aria-label="Accueil">
+      <img ngSrc="/assets/logo_p6.png" alt="Logo MDD" height="401" width="695">
+    </a>
+
+    <!-- Desktop nav -->
+    @if (isLoggedIn$ | async) {
+      <nav class="nav-desktop" aria-label="Navigation principale">
+        <button type="button" class="link logout" (click)="logout()">Se déconnecter</button>
+        <a routerLink="/posts" routerLinkActive="active">Articles</a>
+        <a routerLink="/topics" routerLinkActive="active">Thèmes</a>
+        <a class="profile" routerLink="/me" aria-label="Profil">👤</a>
+      </nav>
+
+      <!-- Mobile hamburger -->
+      <button type="button" class="burger" (click)="toggleMenu()" aria-label="Menu">
+        ☰
+      </button>
+    }
+  </header>
+
+  <!-- Mobile drawer -->
+  @if (menuOpen) {
+    <div class="backdrop" (click)="closeMenu()" aria-hidden="true"></div>
+
+    <aside class="drawer" role="dialog" aria-label="Menu">
+      <button type="button" class="drawer-link logout" (click)="logout()">Se déconnecter</button>
+      <a class="drawer-link" routerLink="/posts" (click)="closeMenu()">Articles</a>
+      <a class="drawer-link" routerLink="/topics" (click)="closeMenu()">Thèmes</a>
+    </aside>
+  }
+}

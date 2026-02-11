@@ -1,0 +1,83 @@
+.topbar {
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  border-bottom: 1px solid #ccc;
+  background: #fff;
+}
+
+.logo img {
+  height: 40px;
+  width: auto;
+}
+
+/* Desktop nav */
+.nav-desktop {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.nav-desktop a {
+  text-decoration: none;
+}
+
+.nav-desktop a.active {
+  text-decoration: underline;
+}
+
+.link.logout,
+.drawer-link.logout {
+  color: #c00;
+}
+
+/* Burger hidden on desktop */
+.burger {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+/* Drawer hidden on desktop */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.drawer {
+  position: fixed;
+  top: 70px;         /* sous le header */
+  right: 0;
+  width: 220px;
+  height: calc(100vh - 70px);
+  background: #fff;
+  border-left: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 18px;
+  gap: 18px;
+}
+
+.drawer-link {
+  text-decoration: none;
+  font-size: 18px;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Responsive: mobile */
+@media (max-width: 768px) {
+  .nav-desktop {
+    display: none;
+  }
+  .burger {
+    display: block;
+  }
+}

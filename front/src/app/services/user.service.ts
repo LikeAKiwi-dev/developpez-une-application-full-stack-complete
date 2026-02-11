@@ -12,6 +12,8 @@ export interface User {
 export class UserService {
   constructor(private http: HttpClient) {}
 
+
+
   me(): Observable<User> {
     return this.http.get<User>(`${environment.apiUrl}/users/me`);
   }

@@ -79,7 +79,7 @@ export class TopicsComponent {
 
   protected logOut() {
     this.authService.logout().subscribe({
-      next: () => window.location.href = '/login',
+      next: () => window.location.href = '/',
       error: () => this.error = 'Une erreur est survenue',
     });
   }

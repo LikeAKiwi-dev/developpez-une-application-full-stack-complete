@@ -1,0 +1,184 @@
+@use 'styles/variables' as *;
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-content {
+  display: flex;
+  justify-content: center;
+  padding-top: 3rem;
+}
+
+.text-align-left{
+  text-align: left !important;
+}
+
+.center-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 1rem;
+}
+
+.logo {
+  max-width: 100%;
+  height: auto;
+}
+
+.form-wrapper {
+  text-align: center;
+}
+
+/* =========================
+   CONTAINER
+========================= */
+
+.container {
+  width: min(1200px, 100%);
+  margin-inline: auto;
+  padding-inline: $space-md;
+}
+
+.container-sm {
+  width: min(768px, 100%);
+  margin-inline: auto;
+  padding-inline: $space-md;
+}
+
+.container-fluid {
+  width: 100%;
+  padding-inline: $space-md;
+}
+
+/* =========================
+   GRID
+========================= */
+.grid-0 {
+  display: grid;
+  gap: 0;
+}
+
+.form-fields {
+  display: grid;
+  gap: 0;
+  border: none;
+  padding: 0;
+}
+
+.grid {
+  display: grid;
+  gap: $space-md;
+}
+
+.grid-center {
+  display: grid;
+  gap: $space-md;
+  place-items: center;
+}
+
+/* Colonnes desktop */
+.grid-1 { grid-template-columns: 1fr; }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .grid-2,
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* font */
+.fs-md { font-size: $space-md; }
+.fs-lg { font-size: $space-lg; }
+
+
+/* spacing */
+.m-0 { margin: 0; }
+.mt-0 { margin-top: 0; }
+.mb-0 { margin-bottom: 0; }
+.me-0 { margin-right: 0; }
+.ms-0 { margin-left: 0; }
+
+.m-xs { margin: $space-xs; }
+.m-sm { margin: $space-sm; }
+.m-md { margin: $space-md; }
+.m-lg { margin: $space-lg; }
+
+.mt-xs { margin-top: $space-xs; }
+.mt-sm { margin-top: $space-sm; }
+.mt-md { margin-top: $space-md; }
+.mt-lg { margin-top: $space-lg; }
+
+.mb-xs { margin-bottom: $space-xs; }
+.mb-sm { margin-bottom: $space-sm; }
+.mb-md { margin-bottom: $space-md; }
+.mb-lg { margin-bottom: $space-lg; }
+
+.me-xs { margin-right: $space-xs; }
+.me-sm { margin-right: $space-sm; }
+.me-md { margin-right: $space-md; }
+.me-lg { margin-right: $space-lg; }
+
+.ms-xs { margin-left: $space-xs; }
+.ms-sm { margin-left: $space-sm; }
+.ms-md { margin-left: $space-md; }
+.ms-lg { margin-left: $space-lg; }
+
+.my-xs { margin-top: $space-xs;margin-bottom: $space-xs; }
+.my-sm { margin-top: $space-sm;margin-bottom: $space-sm; }
+.my-md { margin-top: $space-md;margin-bottom: $space-md; }
+.my-lg { margin-top: $space-lg;margin-bottom: $space-lg; }
+
+.mx-xs { margin-right: $space-xs;margin-left: $space-xs; }
+.mx-sm { margin-right: $space-sm;margin-left: $space-sm; }
+.mx-md { margin-right: $space-md;margin-left: $space-md; }
+.mx-lg { margin-right: $space-lg;margin-left: $space-lg; }
+
+.p-0 { padding: 0; }
+.pt-0 { padding-top: 0; }
+.pb-0 { padding-bottom: 0; }
+.pe-0 { padding-right: 0; }
+.ps-0 { padding-left: 0; }
+
+.p-xs { padding: $space-xs; }
+.p-sm { padding: $space-sm; }
+.p-md { padding: $space-md; }
+.p-lg { padding: $space-lg; }
+
+.pt-xs { padding-top: $space-xs; }
+.pt-sm { padding-top: $space-sm; }
+.pt-md { padding-top: $space-md; }
+.pt-lg { padding-top: $space-lg; }
+
+.pb-xs { padding-bottom: $space-xs; }
+.pb-sm { padding-bottom: $space-sm; }
+.pb-md { padding-bottom: $space-md; }
+.pb-lg { padding-bottom: $space-lg; }
+
+.pe-xs { padding-right: $space-xs; }
+.pe-sm { padding-right: $space-sm; }
+.pe-md { padding-right: $space-md; }
+.pe-lg { padding-right: $space-lg; }
+
+.ps-xs { padding-left: $space-xs; }
+.ps-sm { padding-left: $space-sm; }
+.ps-md { padding-left: $space-md; }
+.ps-lg { padding-left: $space-lg; }
+
+.py-xs { padding-top: $space-xs;padding-bottom: $space-xs; }
+.py-sm { padding-top: $space-sm;padding-bottom: $space-sm; }
+.py-md { padding-top: $space-md;padding-bottom: $space-md; }
+.py-lg { padding-top: $space-lg;padding-bottom: $space-lg; }
+
+.px-xs { padding-right: $space-xs;padding-left: $space-xs; }
+.px-sm { padding-right: $space-sm;padding-left: $space-sm; }
+.px-md { padding-right: $space-md;padding-left: $space-md; }
+.px-lg { padding-right: $space-lg;padding-left: $space-lg; }
+

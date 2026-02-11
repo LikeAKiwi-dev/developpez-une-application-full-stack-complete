@@ -1,7 +1,7 @@
 <main class="container-fluid page">
 
   <page-header
-    [title]="'Se connecter'"
+    [title]="'Inscription'"
     [btnBack]="true">
   </page-header>
 
@@ -11,8 +11,11 @@
 
       <fieldset class="form-fields">
 
-        <label class="text-align-left" for="username">E-mail ou nom d'utilisateur</label>
-        <input id="username" type="text" class="custom-input" formControlName="login" />
+        <label class="text-align-left" for="username">Nom d'utilisateur</label>
+        <input id="username" type="text" class="custom-input" formControlName="username" />
+
+        <label for="email" class="mt-md text-align-left">Adresse e-mail</label>
+        <input id="email" type="email" class="custom-input" formControlName="email" />
 
         <label for="password" class="mt-md text-align-left">Mot de passe</label>
         <input id="password" type="password" class="custom-input" formControlName="password" />
@@ -24,7 +27,7 @@
       }
 
       <button type="submit" class="btn btn-primary mt-md">
-        Se connecter
+        S'inscrire
       </button>
 
     </form>

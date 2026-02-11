@@ -11,6 +11,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
+
 
 import java.util.Map;
 
@@ -36,12 +38,13 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest req) {
+
         if (userRepository.existsByEmail(req.email)) {
-            return ResponseEntity.badRequest().body("Email already used");
+            return ResponseEntity.status(409).body(Map.of("message", "Email already used"));
         }
         if (userRepository.existsByUsername(req.username)) {
-            return ResponseEntity.badRequest().body("Username already used");
+            return ResponseEntity.status(409).body(Map.of("message", "Username already used"));
         }
 
         User u = new User();
@@ -50,7 +53,10 @@ public class AuthController {
         u.setPasswordHash(passwordEncoder.encode(req.password));
         userRepository.save(u);
 
-        return ResponseEntity.ok(Map.of(
+        String token = jwtService.generateToken(u.getUsername());
+
+        return ResponseEntity.status(201).body(Map.of(
+                "token", token,
                 "message", "Account created successfully"
         ));
     }

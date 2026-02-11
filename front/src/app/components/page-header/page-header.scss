@@ -1,0 +1,24 @@
+@use 'styles/variables' as *;
+
+.header-bar {
+  position: relative;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.back-btn {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+.reset-title {
+  margin: 0;
+  font-size: $space-md;
+  font-weight: normal;
+}

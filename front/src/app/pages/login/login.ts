@@ -3,15 +3,16 @@ import { CommonModule } from '@angular/common';
 import {ReactiveFormsModule, FormBuilder, Validators, FormGroup} from '@angular/forms';
 import { Router } from '@angular/router';
 import {AuthService, LoginRequest} from '../../services/auth.service';
+import {PageHeaderComponent} from '../../components/page-header/page-header';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, PageHeaderComponent],
   templateUrl: './login.html',
 })
 export class LoginComponent {
-  error = '';
+  error: string = '';
   form!: FormGroup;
 
   constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {
