@@ -6,18 +6,20 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TopicService } from '../../services/topic.service';
 import {CreatePostRequest, PostService} from '../../services/post.service';
 import { Topic } from '../../models/topic.model';
-import {User, UserService} from '../../services/user.service';
+import { UserMe } from '../../models/user-me.model';
+import { UserService } from '../../services/user.service';
+import {PageHeaderComponent} from '../../components/page-header/page-header';
 
 @Component({
   selector: 'app-post-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, PageHeaderComponent],
   templateUrl: './post-create.html',
 })
 export class PostCreateComponent {
   topics: Topic[] = [];
   error = '';
-  currentUser!: User;
+  currentUser!: UserMe;
   form!: FormGroup;
 
   private readonly destroyRef = inject(DestroyRef);

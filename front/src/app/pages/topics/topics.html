@@ -1,35 +1,31 @@
-<h2>Topics</h2>
+<main class="container-fluid page">
+  <section class="page-wrapper">
 
-<nav>
+    @if (error) { <p class="ui-error" role="alert">{{ error }}</p> }
 
-  @if (currentUser) {
-    <a routerLink="/feed">Feed</a> |
-    <a routerLink="/posts/new">Créer un post</a> |
-    <a href="#" (click)="logOut(); $event.preventDefault()">Log out</a>
-  }@else{
-    <a routerLink="/login">Login</a>
-  }
+    @if (successMsg) {<p class="ui-success">{{ successMsg }}</p>}
 
-</nav>
+    <section class="cards-grid">
+      @for (t of topics; track t.id) {
+        <section class="card">
+          <h3 class="card-title">{{ t.name }}</h3>
 
-@if (successMsg) {
-  <p style="color:green">{{ successMsg }}</p>
-}
+          <p class="meta-row">
+            <span class="clamp-3">
+            {{ t.description ? 'Description : ' + t.description : '/' }}
+            </span>
+          </p>
 
-@if (error) {
-  <p style="color:red">{{ error }}</p>
-}
+          <footer class="text-center">
+            @if (!isSubscribed(t)) {
+              <button class="btn btn-primary" (click)="subscribe(t.id)">S’abonner</button>
+            } @else {
+              <button class="btn btn-info" (click)="unsubscribe(t.id)">Se désabonner</button>
+            }
+          </footer>
 
-<ul>
-  @for (t of topics; track t.id) {
-    <li>
-      {{ t.name }}
-
-      @if (!isSubscribed(t)) {
-        <button (click)="subscribe(t.id)">S’abonner</button>
-      } @else {
-        <button (click)="unsubscribe(t.id)">Se désabonner</button>
+        </section>
       }
-    </li>
-  }
-</ul>
+    </section>
+  </section>
+</main>

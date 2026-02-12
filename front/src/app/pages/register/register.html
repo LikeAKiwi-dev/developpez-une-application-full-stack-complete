@@ -11,7 +11,7 @@
 
       <fieldset class="form-fields">
 
-        <label class="text-align-left" for="username">Nom d'utilisateur</label>
+        <label class="text-align-left mt-md" for="username">Nom d'utilisateur</label>
         <input id="username" type="text" class="custom-input" formControlName="username" />
 
         <label for="email" class="mt-md text-align-left">Adresse e-mail</label>
@@ -23,7 +23,7 @@
       </fieldset>
 
       @if (error) {
-        <p style="color:red">{{ error }}</p>
+        <p class="ui-error">{{ error }}</p>
       }
 
       <button type="submit" class="btn btn-primary mt-md">

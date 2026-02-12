@@ -1,28 +1,49 @@
-@if (error) {
-  <p style="color:red">{{ error }}</p>
-}
+<section class="page-wrapper">
 
-@if (data) {
-  <div>
-    <h2>{{ data.post.title }}</h2>
-    <p>{{ data.post.content }}</p>
-    <p><small>{{ data.post.topic.name }} — {{ data.post.authorUsername }} — {{ data.post.createdAt }}</small></p>
+  @if (error) { <p class="ui-error" role="alert">{{ error }}</p> }
 
-    <h3>Commentaires</h3>
-    <ul>
-      @for (c of data.comments; track c.id){
-        <li>
-          {{ c.content }} — <small>{{ c.authorUsername }} — {{ c.createdAt }}</small>
-        </li>
+  @if (data) {
+    <page-header
+      [title]="data.post.title"
+      [btnBack]="true">
+    </page-header>
+
+    <section class="meta-grid-5">
+      <div class="meta-item">
+        <span>{{ data.post.createdAt | date:'dd/MM/yyyy' }}</span>
+      </div>
+
+      <div class="meta-item">
+        <span>{{ data.post.authorUsername }}</span>
+      </div>
+
+      <div class="meta-item">
+        <span>{{ data.post.topic.name }}</span>
+      </div>
+    </section>
+
+    <p class="clamp-5">{{ data.post.content }}</p>
+
+    <hr class="ui-divider" />
+
+    <h2 class="comments-title">Commentaires</h2>
+
+    <section class="comments-list">
+      @for (c of data.comments; track c.id) {
+        <article class="comment">
+          <div class="comment-author">{{ c.authorUsername }}</div>
+          <div class="comment-bubble">{{ c.content }}</div>
+        </article>
       }
+    </section>
 
-    </ul>
-
-    <h4>Ajouter un commentaire</h4>
-    <form [formGroup]="commentForm" (ngSubmit)="addComment()">
-      <textarea formControlName="content"></textarea>
-      <button type="submit">Envoyer</button>
+    <form class="comment-form" [formGroup]="commentForm" (ngSubmit)="addComment()">
+      <textarea class="comment-input" formControlName="content" placeholder="Écrivez ici votre commentaire" rows="5"></textarea>
+      <button class="send-btn"  type="submit" aria-label="Envoyer">
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-send" viewBox="0 0 16 16">
+          <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576zm6.787-8.201L1.591 6.602l4.339 2.76z"/>
+        </svg>
+      </button>
     </form>
-  </div>
-}
-
+  }
+</section>

@@ -22,6 +22,9 @@ public class Topic {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @Column(nullable = false, unique = true)
+    private String description;
+
     @ManyToMany(mappedBy = "subscriptions")
     private Set<User> subscribers = new HashSet<>();
 }

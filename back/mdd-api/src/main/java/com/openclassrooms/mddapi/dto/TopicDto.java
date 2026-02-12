@@ -8,4 +8,5 @@ import lombok.Getter;
 public class TopicDto {
     private Long id;
     private String name;
+    private String description;
 }

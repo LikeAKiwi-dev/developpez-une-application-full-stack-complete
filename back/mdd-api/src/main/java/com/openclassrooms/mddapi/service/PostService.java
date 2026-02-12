@@ -70,7 +70,7 @@ public class PostService {
                 post.getContent(),
                 post.getCreatedAt(),
                 post.getAuthor().getUsername(),
-                new TopicDto(post.getTopic().getId(), post.getTopic().getName())
+                new TopicDto(post.getTopic().getId(), post.getTopic().getName(), post.getTopic().getDescription())
         );
     }
 }

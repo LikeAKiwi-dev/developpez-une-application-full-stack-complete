@@ -24,6 +24,7 @@ public class TopicController {
                 .map(t -> new TopicResponse(
                         t.getId(),
                         t.getName(),
+                        t.getDescription(),
                         t.getSubscribers()
                                 .stream()
                                 .map(u -> new UserDto(u.getId(), u.getUsername()))

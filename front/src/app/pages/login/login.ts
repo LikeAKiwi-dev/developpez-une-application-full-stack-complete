@@ -29,7 +29,7 @@ export class LoginComponent {
     const payload: LoginRequest = this.form.getRawValue();
 
     this.auth.login(payload).subscribe({
-      next: () => this.router.navigate(['/topics']),
+      next: () => this.router.navigate(['/feed']),
       error: () => (this.error = 'Identifiants invalides (ou back non joignable).'),
     });
   }

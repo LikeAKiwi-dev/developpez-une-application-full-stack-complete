@@ -1,30 +1,46 @@
-<h2>Créer un post</h2>
+<main class="container-fluid page">
 
-<form [formGroup]="form" (ngSubmit)="submit()">
-  <div>
-    <label>Topic</label>
-    <select formControlName="topicId">
-      <option [ngValue]="null">-- Choisir --</option>
-      @for ( t of topics ; track t.id) {
-        <option [ngValue]="t.id">{{ t.name }}</option>
+  <page-header
+    [title]="'Créer un nouvel article'"
+    [btnBack]="true">
+  </page-header>
+
+  <section class="page-content form-wrapper">
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+
+      <fieldset class="form-fields">
+
+        <select class="ui-select mt-md"  formControlName="topicId">
+          <option [ngValue]="null">Sélectionner un thème</option>
+          @for ( t of topics ; track t.id) {
+            <option [ngValue]="t.id">{{ t.name }}</option>
+          }
+        </select>
+
+        <input class="ui-input mt-sm" id="title" type="text" placeholder="Titre de l'article" formControlName="title" />
+
+        <textarea
+          class="ui-textarea mt-sm"
+          id="password"
+          placeholder="Contenu de l'article"
+          rows="5"
+          formControlName="content">
+        </textarea>
+
+      </fieldset>
+
+      @if (error) {
+        <p class="ui-error">{{ error }}</p>
       }
-    </select>
-  </div>
 
-  <div>
-    <label>Titre</label>
-    <input formControlName="title" />
-  </div>
+      <button type="submit" class="btn btn-primary mt-md">
+        Publier
+      </button>
 
-  <div>
-    <label>Contenu</label>
-    <textarea formControlName="content"></textarea>
-  </div>
+    </form>
 
-  <button type="submit">Publier</button>
-</form>
+  </section>
 
-@if (error) {
-  <p style="color:red">{{ error }}</p>
-}
+</main>
 

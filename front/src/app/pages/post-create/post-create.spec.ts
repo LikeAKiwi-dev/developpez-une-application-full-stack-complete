@@ -5,6 +5,7 @@ import { PostCreateComponent } from './post-create';
 import { TopicService } from '../../services/topic.service';
 import { PostService } from '../../services/post.service';
 import { Router, provideRouter } from '@angular/router';
+import { UserService } from '../../services/user.service';
 
 describe('PostCreateComponent', () => {
   const topicServiceMock: { getAll: ReturnType<typeof vi.fn> } = {
@@ -17,6 +18,10 @@ describe('PostCreateComponent', () => {
 
   const routerMock: { navigate: ReturnType<typeof vi.fn> } = {
     navigate: vi.fn(),
+  };
+
+  const userServiceMock = {
+    me: vi.fn(() => of({ id: 1, username: 'test', email: 'test@mail.com', subscriptions: [] })),
   };
 
   beforeEach(async () => {
@@ -38,6 +43,7 @@ describe('PostCreateComponent', () => {
         { provide: TopicService, useValue: topicServiceMock },
         { provide: PostService, useValue: postServiceMock },
         { provide: Router, useValue: routerMock },
+        { provide: UserService, useValue: userServiceMock },
       ],
     }).compileComponents();
 

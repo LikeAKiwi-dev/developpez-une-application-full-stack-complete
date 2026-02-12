@@ -1,0 +1,57 @@
+<main class="container-fluid page page-wrapper">
+
+  <header>
+    <h1 class="text-center">
+      Profile utilisateur
+    </h1>
+  </header>
+
+  <section class="page-content form-wrapper">
+
+    <form [formGroup]="form" (ngSubmit)="save()">
+
+      <fieldset class="form-fields">
+
+        <input id="username" type="text" value="{{ me?.username }}" class="ui-input" placeholder="Username" formControlName="username" />
+
+        <input id="username" type="text" value="{{ me?.email }}" class="ui-input mt-md" placeholder="email@email.fr" formControlName="email" />
+
+        <input id="username" type="password" class="ui-input mt-md" placeholder="Mot de passe" formControlName="password" />
+
+      </fieldset>
+
+      <button type="submit" class="btn btn-primary mt-md">
+        Sauvegarder
+      </button>
+
+    </form>
+
+  </section>
+
+  <hr class="ui-divider">
+
+  <header>
+    <h1 class="text-center">
+      Abonnements
+    </h1>
+
+    <section class="cards-grid">
+      @for (t of me?.subscriptions; track t.id) {
+        <section class="card">
+          <h3 class="card-title">{{ t.name }}</h3>
+
+          <p class="meta-row">
+            <span class="clamp-3">
+            {{ t.description ? 'Description : ' + t.description : '/' }}
+            </span>
+          </p>
+
+          <footer class="text-center">
+            <button class="btn btn-primary" (click)="unsubscribe(t.id)">Se désabonner</button>
+          </footer>
+
+        </section>
+      }
+    </section>
+  </header>
+</main>

@@ -7,10 +7,15 @@
     <!-- Desktop nav -->
     @if (isLoggedIn$ | async) {
       <nav class="nav-desktop" aria-label="Navigation principale">
-        <button type="button" class="link logout" (click)="logout()">Se déconnecter</button>
-        <a routerLink="/posts" routerLinkActive="active">Articles</a>
+        <a type="button" class="link logout" (click)="logout()">Se déconnecter</a>
+        <a routerLink="/feed" routerLinkActive="active">Articles</a>
         <a routerLink="/topics" routerLinkActive="active">Thèmes</a>
-        <a class="profile" routerLink="/me" aria-label="Profil">👤</a>
+        <a class="profile" routerLink="/me" aria-label="Profil">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#c1c1c1" class="bi bi-person-circle" viewBox="0 0 16 16">
+            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+            <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+          </svg>
+        </a>
       </nav>
 
       <!-- Mobile hamburger -->
@@ -22,8 +27,6 @@
 
   <!-- Mobile drawer -->
   @if (menuOpen) {
-    <div class="backdrop" (click)="closeMenu()" aria-hidden="true"></div>
-
     <aside class="drawer" role="dialog" aria-label="Menu">
       <button type="button" class="drawer-link logout" (click)="logout()">Se déconnecter</button>
       <a class="drawer-link" routerLink="/posts" (click)="closeMenu()">Articles</a>

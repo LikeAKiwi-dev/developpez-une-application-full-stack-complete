@@ -1,23 +1,21 @@
 import { Component, DestroyRef, inject } from '@angular/core';
 import { TopicService } from '../../services/topic.service';
 import { SubscriptionService } from '../../services/subscription.service';
-import { UserService, User } from '../../services/user.service';
+import { UserService } from '../../services/user.service';
 import { Topic } from '../../models/topic.model';
+import { UserMe } from '../../models/user-me.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import {RouterLink} from '@angular/router';
-import {AuthService} from '../../services/auth.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-topics',
   standalone: true,
   templateUrl: './topics.html',
-  imports: [
-    RouterLink
-  ]
+  imports: [],
 })
 export class TopicsComponent {
   topics: Topic[] = [];
-  currentUser!: User;
+  currentUser!: UserMe;
   error = '';
   successMsg = '';
 
@@ -31,6 +29,7 @@ export class TopicsComponent {
   ) {
     this.load();
   }
+
 
   private load(): void {
     this.userService.me()
@@ -58,6 +57,7 @@ export class TopicsComponent {
   }
 
   subscribe(topicId: number): void {
+    this.successMsg = '';
     this.subscriptionService.subscribe(topicId).subscribe({
       next: () => {
         this.successMsg = 'Abonnement effectué';
@@ -68,6 +68,7 @@ export class TopicsComponent {
   }
 
   unsubscribe(topicId: number): void {
+    this.successMsg = '';
     this.subscriptionService.unsubscribe(topicId).subscribe({
       next: () => {
         this.successMsg = 'Désabonnement effectué';

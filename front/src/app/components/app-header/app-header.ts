@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router, RouterLink, NavigationEnd } from '@angular/router';
+import {Router, RouterLink, NavigationEnd, RouterLinkActive} from '@angular/router';
 import {AsyncPipe, NgOptimizedImage} from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { filter } from 'rxjs/operators';
@@ -8,7 +8,7 @@ import {Observable} from 'rxjs';
 @Component({
   selector: 'app-app-header',
   standalone: true,
-  imports: [RouterLink, AsyncPipe, NgOptimizedImage],
+  imports: [RouterLink, AsyncPipe, NgOptimizedImage, RouterLinkActive],
   templateUrl: './app-header.html',
   styleUrl: './app-header.scss',
 })

@@ -8,7 +8,7 @@ import { UserService } from '../../services/user.service';
 import { provideRouter } from '@angular/router';
 
 describe('TopicsComponent', () => {
-  const userMock = { id: 1, username: 'test' };
+  const userMock = { id: 1, username: 'test', email: 'test@mail.com', subscriptions: [] };
 
   const topicsMock = [
     { id: 1, name: 'Java', subscribers: [{ id: 1, username: 'test' }] },

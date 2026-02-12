@@ -1,15 +1,17 @@
+@use 'styles/variables' as *;
+
 .topbar {
-  height: 70px;
+  height: $header-height;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
-  border-bottom: 1px solid #ccc;
+  padding: 0 $space-md;
+  border-bottom: $border-thin solid #ccc;
   background: #fff;
 }
 
 .logo img {
-  height: 40px;
+  height: 2.5rem; /* ~40px */
   width: auto;
 }
 
@@ -17,20 +19,23 @@
 .nav-desktop {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: $space-md;
 }
 
 .nav-desktop a {
   text-decoration: none;
+  color: black;
 }
 
 .nav-desktop a.active {
-  text-decoration: underline;
+  color: $color-primary;
 }
 
 .link.logout,
 .drawer-link.logout {
-  color: #c00;
+  cursor: pointer;
+  color: #c00 !important;
+  font-weight: bold;
 }
 
 /* Burger hidden on desktop */
@@ -38,11 +43,11 @@
   display: none;
   background: none;
   border: none;
-  font-size: 28px;
+  font-size: 1.75rem; /* ~28px */
   cursor: pointer;
 }
 
-/* Drawer hidden on desktop */
+/* Drawer */
 .backdrop {
   position: fixed;
   inset: 0;
@@ -51,21 +56,22 @@
 
 .drawer {
   position: fixed;
-  top: 70px;         /* sous le header */
+  top: $header-height;
   right: 0;
-  width: 220px;
-  height: calc(100vh - 70px);
+  width: 13.75rem; /* ~220px */
+  height: calc(100vh - #{$header-height});
   background: #fff;
-  border-left: 1px solid #ccc;
+  border-left: $border-thin solid #ccc;
   display: flex;
   flex-direction: column;
-  padding: 24px 18px;
-  gap: 18px;
+  padding: $space-md;
+  gap: $space-md;
+  z-index: 1024;
 }
 
 .drawer-link {
   text-decoration: none;
-  font-size: 18px;
+  font-size: 1.125rem; /* ~18px */
   background: none;
   border: none;
   text-align: left;
@@ -73,11 +79,7 @@
 }
 
 /* Responsive: mobile */
-@media (max-width: 768px) {
-  .nav-desktop {
-    display: none;
-  }
-  .burger {
-    display: block;
-  }
+@media (max-width: $bp-md) {
+  .nav-desktop { display: none; }
+  .burger { display: block; }
 }

@@ -5,11 +5,12 @@ import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {CreateCommentRequest, PostService} from '../../services/post.service';
 import { PostDetailResponse } from '../../models/post.model';
+import {PageHeaderComponent} from '../../components/page-header/page-header';
 
 @Component({
   selector: 'app-post-detail',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, PageHeaderComponent],
   templateUrl: './post-detail.html',
 })
 export class PostDetailComponent {

@@ -1,15 +1,33 @@
-<h2>Fil d’actualité</h2>
-<a routerLink="/posts/new">Créer un post</a>
+<main class="container-fluid page">
+  <section class="page-wrapper">
 
-@if (error) {
-  <p style="color:red">{{ error }}</p>
-}
+    @if (error) { <p class="ui-error" role="alert">{{ error }}</p> }
 
-<ul>
-  @for ( p of posts ; track p.id) {
-    <li>
-      <a [routerLink]="['/posts', p.id]">{{ p.title }}</a>
-      — {{ p.topic.name }} — {{ p.authorUsername }}
-    </li>
-  }
-</ul>
+    <div class="action-bar">
+      <button class="btn btn-primary" routerLink="/posts/new">Créer un article</button>
+      <button type="button" class="link-btn action-right" (click)="toggleSort()">
+        Trier par
+        <span class="arrow">
+          {{ sortAsc ? '↑' : '↓' }}
+        </span>
+      </button>
+    </div>
+
+    <section class="cards-grid">
+      @for (p of posts; track p.id) {
+        <a class="card" [routerLink]="['/posts', p.id]">
+          <h3 class="card-title">{{ p.title }}</h3>
+
+          <section class="meta-row">
+            <span>{{ p.createdAt | date:'dd/MM/yyyy' }}</span>
+            <span>{{ p.authorUsername }}</span>
+          </section>
+
+          <p class="clamp-5">{{ p.content }}</p>
+        </a>
+      }
+    </section>
+
+  </section>
+
+</main>
