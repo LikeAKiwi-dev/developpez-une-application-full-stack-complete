@@ -3,7 +3,7 @@
 
     @if (error) { <p class="ui-error" role="alert">{{ error }}</p> }
 
-    <div class="action-bar">
+    <nav class="action-bar">
       <button class="btn btn-primary" routerLink="/posts/new">Créer un article</button>
       <button type="button" class="link-btn action-right" (click)="toggleSort()">
         Trier par
@@ -11,7 +11,7 @@
           {{ sortAsc ? '↑' : '↓' }}
         </span>
       </button>
-    </div>
+    </nav>
 
     <section class="cards-grid">
       @for (p of posts; track p.id) {

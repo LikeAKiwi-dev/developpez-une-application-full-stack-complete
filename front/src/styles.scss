@@ -59,3 +59,39 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   background-color: $color-primary;
   color: white;
 }
+
+.profile {
+  color: #c1c1c1 !important;
+}
+
+.profile.active-link {
+  color: #7550ec !important;
+}
+
+.mobile-profile {
+  display: none;
+}
+
+@media (max-width: $bp-md) {
+  .mobile-profile {
+    position: fixed;
+    bottom: 1.25rem;
+    right: 1.25rem;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: #f1f1f1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #c1c1c1;
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.15);
+    z-index: 1024;
+    transition: 0.2s ease;
+  }
+
+  .mobile-profile.active-link {
+    color: #7550ec;
+  }
+}
+

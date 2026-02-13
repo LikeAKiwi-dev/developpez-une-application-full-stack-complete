@@ -41,9 +41,20 @@ class TopicControllerIntegrationTest {
     void setUp() {
         topicRepository.deleteAll();
 
-        Topic t = new Topic();
-        t.setName("Java");
-        topicRepository.save(t);
+        Topic java = new Topic();
+        java.setName("Java");
+        java.setDescription("Topic Java");
+        topicRepository.save(java);
+
+        Topic js = new Topic();
+        js.setName("JavaScript");
+        js.setDescription("Topic JavaScript");
+        topicRepository.save(js);
+
+        Topic python = new Topic();
+        python.setName("Python");
+        python.setDescription("Topic Python");
+        topicRepository.save(python);
     }
 
     private String loginAndGetToken() throws Exception {
@@ -54,7 +65,7 @@ class TopicControllerIntegrationTest {
                         .content("""
                                 {"username":"test","email":"test@test.com","password":"Password123!"}
                                 """))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)

@@ -9,20 +9,20 @@
     </page-header>
 
     <section class="meta-grid-5">
-      <div class="meta-item">
+      <article class="meta-item">
         <span>{{ data.post.createdAt | date:'dd/MM/yyyy' }}</span>
-      </div>
+      </article>
 
-      <div class="meta-item">
+      <article class="meta-item">
         <span>{{ data.post.authorUsername }}</span>
-      </div>
+      </article>
 
-      <div class="meta-item">
+      <article class="meta-item">
         <span>{{ data.post.topic.name }}</span>
-      </div>
+      </article>
     </section>
 
-    <p class="clamp-5">{{ data.post.content }}</p>
+    <p class="clamp">{{ data.post.content }}</p>
 
     <hr class="ui-divider" />
 
@@ -31,8 +31,8 @@
     <section class="comments-list">
       @for (c of data.comments; track c.id) {
         <article class="comment">
-          <div class="comment-author">{{ c.authorUsername }}</div>
-          <div class="comment-bubble">{{ c.content }}</div>
+          <span class="comment-author">{{ c.authorUsername }}</span>
+          <span class="comment-bubble">{{ c.content }}</span>
         </article>
       }
     </section>
