@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassrooms.mddapi.dto.RegisterRequest;
 import com.openclassrooms.mddapi.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,11 @@ class AuthControllerIntegrationTest {
     @Autowired
     private UserRepository userRepository;
 
+    @BeforeEach
+    void resetDb() {
+        userRepository.deleteAll();
+    }
+
     @Test
     void shouldRegisterUser() throws Exception {
         RegisterRequest request = new RegisterRequest();
@@ -42,8 +48,9 @@ class AuthControllerIntegrationTest {
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Account created successfully"));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.message").value("Account created successfully"))
+                .andExpect(jsonPath("$.token").isString());
     }
 
     @Test
@@ -61,12 +68,13 @@ class AuthControllerIntegrationTest {
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request1)))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request2)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("Email already used"));
     }
 
     @Test
@@ -84,24 +92,23 @@ class AuthControllerIntegrationTest {
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request1)))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request2)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("Username already used"));
     }
 
     @Test
     void shouldLoginAndAccessMeWithJwt() throws Exception {
-        userRepository.deleteAll();
-
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"username":"test","email":"test@test.com","password":"Password123!"}
                                 """))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
