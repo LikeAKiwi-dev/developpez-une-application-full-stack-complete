@@ -1,6 +1,5 @@
 /// <reference types="cypress" />
-
-describe('Posts + Comments + Feed', () => {
+describe('Posts + Comments (E2E)', () => {
   const login = 'test';
   const password = 'Password123!';
 
@@ -9,59 +8,59 @@ describe('Posts + Comments + Feed', () => {
     cy.apiLogin(login, password);
   });
 
-  it('Displays the feed', () => {
-    cy.intercept('GET', '**/api/feed').as('getFeed');
-
-    cy.visit('/feed');
-    cy.wait('@getFeed').its('response.statusCode').should('eq', 200);
-
-    cy.get('body').should('contain.text', '');
-  });
-
-  it('Allows you to create a post and then return feed', () => {
+  it('Crée un post, revient au feed, ouvre le détail et ajoute un commentaire', () => {
     cy.intercept('GET', '**/api/topics').as('getTopics');
     cy.intercept('POST', '**/api/posts').as('createPost');
 
-    cy.visit('/posts/new');
-
-    cy.wait('@getTopics');
-
-    cy.get('input[formcontrolname="title"]').type('Post Cypress');
-    cy.get('textarea[formcontrolname="content"]').type('Contenu Cypress');
-
-    cy.get('select[formcontrolname="topicId"]').select(1);
-
-    cy.get('form').submit();
-
-    cy.wait('@createPost')
-      .its('response.statusCode')
-      .should('be.oneOf', [200, 201]);
-
-    cy.location('pathname').should('eq', '/feed');
-  });
-
-  it("Allows you to open a post and add a comment", () => {
+    // IMPORTANT: le feed = /api/feed (pas /api/posts)
     cy.intercept('GET', '**/api/feed').as('getFeed');
-    cy.intercept('GET', '**/api/posts/*').as('getPost');
+
+    cy.intercept('GET', '**/api/posts/*').as('getPostDetail');
+
+    // IMPORTANT: commentaire = /api/posts/:id/comments
     cy.intercept('POST', '**/api/posts/*/comments').as('addComment');
 
-    cy.visit('/feed');
-    cy.wait('@getFeed');
+    const title = `Post Cypress ${Date.now()}`;
+    const content = 'Contenu de test Cypress.';
+    const comment = 'Commentaire Cypress.';
 
-    cy.get('a[href^="/posts/"]')
-      .not('[href="/posts/new"]')
-      .first()
-      .click({ force: true });
+    // 1) Création
+    cy.visit('/posts/new');
 
-    cy.wait('@getPost');
+    cy.wait('@getTopics').then((interception) => {
+      expect(interception.response?.statusCode).to.eq(200);
 
-    cy.get('textarea[formcontrolname="content"]').type('Commentaire Cypress');
+      const bodyUnknown: unknown = interception.response?.body;
+      const topics: TopicApi[] = Array.isArray(bodyUnknown) ? (bodyUnknown as TopicApi[]) : [];
+      expect(topics.length).to.be.greaterThan(0);
+
+      const firstTopicName = topics[0].name;
+      expect(firstTopicName).to.be.a('string');
+
+      // ngValue => on sélectionne par le texte
+      cy.get('select[formcontrolname="topicId"]').select(firstTopicName);
+    });
+
+    cy.get('input[formcontrolname="title"]').type(title);
+    cy.get('textarea[formcontrolname="content"]').type(content);
     cy.get('form').submit();
 
-    cy.wait('@addComment')
-      .its('response.statusCode')
-      .should('be.oneOf', [200, 201]);
+    cy.wait('@createPost').its('response.statusCode').should('be.oneOf', [200, 201]);
 
-    cy.contains(/Commentaire Cypress/i).should('be.visible');
+    // 2) Feed
+    cy.visit('/feed');
+    cy.wait('@getFeed').its('response.statusCode').should('eq', 200);
+
+    // Post = <a class="card">
+    cy.contains('a.card', title).click();
+
+    // 3) Détail + commentaire
+    cy.wait('@getPostDetail').its('response.statusCode').should('eq', 200);
+
+    cy.get('textarea[formcontrolname="content"]').type(comment);
+    cy.get('form.comment-form').submit();
+
+    cy.wait('@addComment').its('response.statusCode').should('be.oneOf', [200, 201]);
+    cy.contains('.comment-bubble', comment).should('be.visible');
   });
 });

@@ -1,6 +1,8 @@
 /// <reference types="cypress" />
 
-describe('Topics', () => {
+type TopicApi = { id: number; name: string };
+
+describe('Topics (E2E)', () => {
   const login = 'test';
   const password = 'Password123!';
 
@@ -9,16 +11,27 @@ describe('Topics', () => {
     cy.apiLogin(login, password);
   });
 
-  it('Displays the list of topics from the database via the back', () => {
-    cy.intercept('GET', '**/api/topics').as('getTopicsApi');
+  it('Charge les topics depuis le back et affiche les cards', () => {
+    cy.intercept('GET', '**/api/users/me').as('getMe');
+    cy.intercept('GET', '**/api/topics').as('getTopics');
 
     cy.visit('/topics');
 
-    cy.wait('@getTopicsApi').its('response.statusCode').should('eq', 200);
+    cy.wait('@getMe').its('response.statusCode').should('eq', 200);
 
-    cy.get('li').should('have.length.greaterThan', 0);
-    cy.contains('li', 'Java').should('be.visible');
-    cy.contains('li', 'JavaScript').should('be.visible');
-    cy.contains('li', 'Python').should('be.visible');
+    cy.wait('@getTopics').then((interception) => {
+      expect(interception.response?.statusCode).to.eq(200);
+
+      const bodyUnknown: unknown = interception.response?.body;
+      const topics: TopicApi[] = Array.isArray(bodyUnknown) ? (bodyUnknown as TopicApi[]) : [];
+
+      expect(topics.length).to.be.greaterThan(0);
+
+      // Ton HTML affiche les noms dans .card-title (pas des <li>)
+      topics.slice(0, 3).forEach((t) => {
+        expect(t.name).to.be.a('string');
+        cy.contains('.card-title', t.name).should('be.visible');
+      });
+    });
   });
 });

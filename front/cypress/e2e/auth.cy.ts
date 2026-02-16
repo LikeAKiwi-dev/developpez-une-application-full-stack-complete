@@ -1,10 +1,10 @@
 /// <reference types="cypress" />
 
-describe('Auth', () => {
+describe('Auth (E2E)', () => {
   const login = 'test';
   const password = 'Password123!';
 
-  it("allows you to connect via the UI", () => {
+  it('Se connecte via l’UI et redirige vers /feed', () => {
     cy.apiRegisterIfNeeded(login, password);
 
     cy.intercept('POST', '**/api/auth/login').as('loginReq');
@@ -16,27 +16,26 @@ describe('Auth', () => {
 
     cy.get('form').submit();
 
-    cy.wait('@loginReq')
-      .its('response.statusCode')
-      .should('eq', 200);
+    cy.wait('@loginReq').its('response.statusCode').should('eq', 200);
 
-    cy.location('pathname').should('not.eq', '/login');
+    cy.location('pathname').should('eq', '/feed');
   });
 
-  it("Shows an error if wrong password", () => {
+  it('Affiche une erreur si mauvais mot de passe', () => {
+    cy.apiRegisterIfNeeded(login, password);
+
     cy.intercept('POST', '**/api/auth/login').as('loginReq');
 
     cy.visit('/login');
 
     cy.get('input[formcontrolname="login"]').type(login);
-    cy.get('input[formcontrolname="password"]').type('wrong');
+    cy.get('input[formcontrolname="password"]').type('WrongPassword!');
 
     cy.get('form').submit();
 
-    cy.wait('@loginReq')
-      .its('response.statusCode')
-      .should('be.oneOf', [401, 403]);
+    cy.wait('@loginReq').its('response.statusCode').should('eq', 401);
 
-    cy.contains(/invalid|incorrect|erreur|mauvais|échec/i).should('be.visible');
+    cy.contains('Identifiants invalides (ou back non joignable).').should('be.visible');
+    cy.location('pathname').should('eq', '/login');
   });
 });

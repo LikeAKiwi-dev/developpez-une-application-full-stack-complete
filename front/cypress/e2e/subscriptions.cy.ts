@@ -1,6 +1,19 @@
 /// <reference types="cypress" />
 
-describe('Subscribe (Topics)', () => {
+const apiUrl = (): string => {
+  const fromEnv: unknown = Cypress.env('apiUrl');
+  return typeof fromEnv === 'string' && fromEnv.length > 0 ? fromEnv : 'http://localhost:8080/api';
+};
+
+const apiAuthHeaders = (): { Authorization: string } => {
+  const tokenUnknown: unknown = Cypress.env('token');
+  const token = typeof tokenUnknown === 'string' ? tokenUnknown : '';
+  expect(token).to.be.a('string');
+  expect(token.length).to.be.greaterThan(0);
+  return { Authorization: `Bearer ${token}` };
+};
+
+describe('Subscriptions (E2E)', () => {
   const login = 'test';
   const password = 'Password123!';
 
@@ -9,115 +22,91 @@ describe('Subscribe (Topics)', () => {
     cy.apiLogin(login, password);
   });
 
-  it("'Unsubscribe' poster on a topic to which I am subscribed (forced state)", () => {
-    cy.request<Array<{ id: number; name: string }>>({
-      method: 'GET',
-      url: 'http://localhost:8080/api/topics',
-      headers: { Authorization: `Bearer ${Cypress.env('token')}` },
-      failOnStatusCode: false,
-    }).then((res) => {
-      expect(res.status).to.eq(200);
+  it('Permet de basculer abonnement/désabonnement via l’UI (Topics page)', () => {
+    cy.intercept('GET', '**/api/users/me').as('getMe');
+    cy.intercept('GET', '**/api/topics').as('getTopics');
+    cy.intercept('POST', '**/api/subscriptions/*').as('subscribe');
+    cy.intercept('DELETE', '**/api/subscriptions/*').as('unsubscribe');
 
-      const topics = res.body;
+    cy.visit('/topics');
+
+    cy.wait('@getMe').its('response.statusCode').should('eq', 200);
+    cy.wait('@getTopics').its('response.statusCode').should('eq', 200);
+
+    // On accepte les 2 libellés : apostrophe typographique (’) ou simple (')
+    const subscribeLabels = ["S’abonner", "S'abonner"];
+    const unsubscribeLabels = ["Se désabonner", "Se desabonner", "Se désabonner", "Se desabonner"];
+
+    // Cherche un bouton "S'abonner" (si l'utilisateur n'est pas abonné partout)
+    cy.get('body').then(($body) => {
+      const hasSubscribe =
+        subscribeLabels.some((label) => $body.find(`button:contains("${label}")`).length > 0);
+
+      if (hasSubscribe) {
+        // Cas normal : on s'abonne puis on se désabonne
+        cy.contains('button', /S[’']abonner/).first().click();
+        cy.wait('@subscribe').its('response.statusCode').should('be.oneOf', [200, 201, 204]);
+        cy.contains('Abonnement effectué').should('be.visible');
+
+        cy.contains('button', /Se d[ée]sabonner/).first().click();
+        cy.wait('@unsubscribe').its('response.statusCode').should('be.oneOf', [200, 204]);
+        cy.contains('Désabonnement effectué').should('be.visible');
+        return;
+      }
+
+      // Sinon : l'utilisateur est probablement déjà abonné partout -> on force un "toggle"
+      const hasUnsubscribe =
+        unsubscribeLabels.some((label) => $body.find(`button:contains("${label}")`).length > 0);
+
+      expect(hasUnsubscribe).to.eq(true);
+
+      // On se désabonne d'abord pour faire apparaître ensuite "S'abonner"
+      cy.contains('button', /Se d[ée]sabonner/).first().click();
+      cy.wait('@unsubscribe').its('response.statusCode').should('be.oneOf', [200, 204]);
+      cy.contains('Désabonnement effectué').should('be.visible');
+
+      // Puis on se ré-abonne
+      cy.contains('button', /S[’']abonner/).first().click();
+      cy.wait('@subscribe').its('response.statusCode').should('be.oneOf', [200, 201, 204]);
+      cy.contains('Abonnement effectué').should('be.visible');
+    });
+  });
+
+  it('Le topic abonné apparaît dans /me > Abonnements (contrôle back->UI)', () => {
+    cy.request({
+      method: 'GET',
+      url: `${apiUrl()}/topics`,
+      headers: apiAuthHeaders(),
+    }).then((resp) => {
+      expect(resp.status).to.eq(200);
+
+      const bodyUnknown: unknown = resp.body;
+      const topics: TopicApi[] = Array.isArray(bodyUnknown) ? (bodyUnknown as TopicApi[]) : [];
       expect(topics.length).to.be.greaterThan(0);
 
       const topicId = topics[0].id;
       const topicName = topics[0].name;
 
-      cy.request<void>({
+      expect(topicId).to.be.a('number');
+      expect(topicName).to.be.a('string');
+
+      cy.request({
         method: 'POST',
-        url: `http://localhost:8080/api/subscriptions/${topicId}`,
-        headers: { Authorization: `Bearer ${Cypress.env('token')}` },
+        url: `${apiUrl()}/subscriptions/${topicId}`,
+        headers: apiAuthHeaders(),
         failOnStatusCode: false,
-      }).then((subRes) => {
-        expect([200, 201, 204, 409]).to.include(subRes.status);
-
-        cy.intercept('GET', '**/api/topics').as('getTopics');
-        cy.visit('/topics');
-        cy.wait('@getTopics');
-
-        cy.contains('li', topicName)
-          .should('be.visible')
-          .within(() => {
-            cy.contains(/se désabonner/i).should('be.visible');
-          });
+      }).then((r) => {
+        // 409 si déjà abonné -> OK
+        expect([200, 201, 204, 409]).to.include(r.status);
       });
-    });
-  });
 
-  it('Displays the list of topics and allows you to (un)subscribe', () => {
-    cy.intercept('GET', '**/api/topics').as('getTopics');
+      cy.intercept('GET', '**/api/users/me').as('getMe');
+      cy.visit('/me');
 
-    cy.intercept('POST', '**/api/subscriptions/*').as('toggleSub');
-    cy.intercept('DELETE', '**/api/subscriptions/*').as('toggleSub');
+      cy.wait('@getMe').its('response.statusCode').should('eq', 200);
 
-    cy.visit('/topics');
-    cy.wait('@getTopics').its('response.statusCode').should('eq', 200);
-
-    cy.get('li').first().as('firstTopic');
-
-    cy.get('@firstTopic').within(() => {
-      cy.get('button').then(($btn: JQuery<HTMLElement>) => {
-        const label: string = ($btn.text() || '').toLowerCase();
-
-        cy.wrap($btn).click();
-
-        cy.wait('@toggleSub')
-          .its('response.statusCode')
-          .should('be.oneOf', [200, 201, 204, 409]);
-
-        if (label.includes('désabonn')) {
-          cy.contains(/s[’']abonner|abonner/i).should('be.visible');
-        } else {
-          cy.contains(/se désabonner|désabonn/i).should('be.visible');
-        }
-      });
-    });
-  });
-
-  it('Allows you to filter only the topics I am subscribed to (if filter present)', () => {
-    cy.intercept('GET', '**/api/topics').as('getTopics');
-
-    cy.visit('/topics');
-
-    cy.wait('@getTopics').then((interception) => {
-      const body = (interception.response?.body ?? []) as Array<{
-        id: number;
-        name: string;
-        subscribers?: Array<{ id: number; username: string }>;
-      }>;
-
-      const subscribedNames: string[] = body
-        .filter((t) => (t.subscribers ?? []).some((s) => s.username === login))
-        .map((t) => t.name);
-
-      cy.get('body').then(($body: JQuery<HTMLElement>) => {
-        const $btn: JQuery<HTMLElement> = $body
-          .find('button')
-          .filter((_index: number, el: HTMLElement) => {
-            const txt = (el.textContent ?? '').toLowerCase();
-            return txt.includes('mes abonn'); // couvre "mes abonnements" / "mes abonnés"
-          });
-
-        if (!$btn.length) {
-          cy.log('No "my subscriptions" filter present in the UI → test skipped.');
-          return;
-        }
-
-        cy.wrap($btn.first()).click();
-
-        cy.get('li').each(($li: JQuery<HTMLElement>) => {
-          const liText: string = $li.text();
-          const match: boolean = subscribedNames.some((name: string) => liText.includes(name));
-          expect(match, `topic affiché doit être abonné: "${liText}"`).to.eq(true);
-        });
-
-        if (subscribedNames.length > 0) {
-          cy.get('li').each(($li: JQuery<HTMLElement>) => {
-            cy.wrap($li).contains(/se désabonner|désabonn/i).should('be.visible');
-          });
-        }
-      });
+      cy.contains('h1', 'Abonnements').should('be.visible');
+      cy.contains('.card-title', topicName).should('be.visible');
     });
   });
 });
