@@ -1,39 +1,35 @@
 package com.openclassrooms.mddapi.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openclassrooms.mddapi.dto.*;
 import com.openclassrooms.mddapi.service.CommentService;
 import com.openclassrooms.mddapi.service.PostService;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.MockMvc;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(PostController.class)
-@AutoConfigureMockMvc(addFilters = false)
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
 class PostControllerTest {
 
     @Autowired
     private MockMvc mvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
 
     @MockitoBean
     private PostService postService;
@@ -41,102 +37,104 @@ class PostControllerTest {
     @MockitoBean
     private CommentService commentService;
 
-    PostControllerTest(MockMvc mvc, ObjectMapper objectMapper) {
-        this.mvc = mvc;
-        this.objectMapper = objectMapper;
-    }
-
     @Test
     void create_returns_401_when_not_authenticated() throws Exception {
-        PostCreateRequest req = new PostCreateRequest();
-        req.setTitle("Titre");
-        req.setContent("Contenu");
-        req.setTopicId(1L);
+        String body = """
+            {"title":"Hello","content":"World","topicId":1}
+            """;
 
         mvc.perform(post("/api/posts")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
+                        .content(body))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
-    @WithMockUser(username = "test")
+    @WithMockUser(username = "alice")
     void create_returns_200_and_calls_service() throws Exception {
-        PostCreateRequest req = new PostCreateRequest();
-        req.setTitle("Titre");
-        req.setContent("Contenu");
-        req.setTopicId(1L);
-
+        LocalDateTime now = LocalDateTime.now();
         TopicDto topic = new TopicDto(1L, "Java", "Desc");
-        PostDto created = new PostDto(10L, "Titre", "Contenu", LocalDateTime.now(), "test", topic);
+        PostDto created = new PostDto(10L, "Hello", "World", now, "alice", topic);
 
-        when(postService.create(eq("test"), any(PostCreateRequest.class))).thenReturn(created);
+        when(postService.create(eq("alice"), any(PostCreateRequest.class)))
+                .thenReturn(created);
+
+        String body = """
+            {"title":"Hello","content":"World","topicId":1}
+            """;
 
         mvc.perform(post("/api/posts")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
+                        .content(body))
                 .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(10))
-                .andExpect(jsonPath("$.title").value("Titre"))
-                .andExpect(jsonPath("$.content").value("Contenu"))
-                .andExpect(jsonPath("$.authorUsername").value("test"))
-                .andExpect(jsonPath("$.topic.id").value(1))
-                .andExpect(jsonPath("$.topic.name").value("Java"));
+                .andExpect(jsonPath("$.title").value("Hello"))
+                .andExpect(jsonPath("$.authorUsername").value("alice"))
+                .andExpect(jsonPath("$.topic.id").value(1));
 
-        verify(postService).create(eq("test"), any(PostCreateRequest.class));
+        ArgumentCaptor<PostCreateRequest> captor = ArgumentCaptor.forClass(PostCreateRequest.class);
+        verify(postService).create(eq("alice"), captor.capture());
+        assertThat(captor.getValue().getTitle()).isEqualTo("Hello");
+        assertThat(captor.getValue().getContent()).isEqualTo("World");
+        assertThat(captor.getValue().getTopicId()).isEqualTo(1L);
     }
 
     @Test
-    @WithMockUser(username = "test")
+    void getById_returns_401_when_not_authenticated() throws Exception {
+        mvc.perform(get("/api/posts/10"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = "alice")
     void getById_returns_200_and_calls_service() throws Exception {
+        LocalDateTime now = LocalDateTime.now();
         TopicDto topic = new TopicDto(1L, "Java", "Desc");
-        PostDto post = new PostDto(10L, "Titre", "Contenu", LocalDateTime.now(), "test", topic);
+        PostDto post = new PostDto(10L, "Hello", "World", now, "alice", topic);
+        List<CommentDto> comments = List.of(new CommentDto(100L, "Nice", now, "bob"));
 
-        CommentDto c1 = new CommentDto(1L, "Salut", LocalDateTime.now(), "alice");
-        CommentDto c2 = new CommentDto(2L, "Yo", LocalDateTime.now(), "bob");
+        PostDetailResponse response = new PostDetailResponse(post, comments);
 
-        PostDetailResponse detail = new PostDetailResponse(post, List.of(c1, c2));
-
-        when(postService.getById(10L)).thenReturn(detail);
+        when(postService.getById(10L)).thenReturn(response);
 
         mvc.perform(get("/api/posts/10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.post.id").value(10))
-                .andExpect(jsonPath("$.post.title").value("Titre"))
-                .andExpect(jsonPath("$.comments.length()").value(2));
+                .andExpect(jsonPath("$.comments[0].id").value(100));
 
         verify(postService).getById(10L);
     }
 
     @Test
     void addComment_returns_401_when_not_authenticated() throws Exception {
-        CommentCreateRequest req = new CommentCreateRequest();
-        req.setContent("Hello");
+        String body = """
+            {"content":"Nice"}
+            """;
 
         mvc.perform(post("/api/posts/10/comments")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
+                        .content(body))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
-    @WithMockUser(username = "test")
+    @WithMockUser(username = "alice")
     void addComment_returns_200_and_calls_service() throws Exception {
-        CommentCreateRequest req = new CommentCreateRequest();
-        req.setContent("Hello");
+        when(commentService.add(eq("alice"), eq(10L), any(CommentCreateRequest.class)))
+        .thenAnswer(inv -> null);
 
-        CommentDto created = new CommentDto(99L, "Hello", LocalDateTime.now(), "test");
-
-        when(commentService.add(eq("test"), eq(10L), any(CommentCreateRequest.class))).thenReturn(created);
+        String body = """
+            {"content":"Nice"}
+            """;
 
         mvc.perform(post("/api/posts/10/comments")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(99))
-                .andExpect(jsonPath("$.content").value("Hello"))
-                .andExpect(jsonPath("$.authorUsername").value("test"));
+                        .content(body))
+                .andExpect(status().isOk());
 
-        verify(commentService).add(eq("test"), eq(10L), any(CommentCreateRequest.class));
+        ArgumentCaptor<CommentCreateRequest> captor = ArgumentCaptor.forClass(CommentCreateRequest.class);
+        verify(commentService).add(eq("alice"), eq(10L), captor.capture());
+        assertThat(captor.getValue().getContent()).isEqualTo("Nice");
     }
 }

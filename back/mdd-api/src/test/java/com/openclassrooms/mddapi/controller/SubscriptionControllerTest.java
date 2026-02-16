@@ -29,7 +29,6 @@ class SubscriptionControllerTest {
     @MockitoBean
     private SubscriptionService subscriptionService;
 
-    // Dépendances du JwtAuthenticationFilter
     @MockitoBean
     private JwtService jwtService;
 
