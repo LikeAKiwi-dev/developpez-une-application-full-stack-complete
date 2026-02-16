@@ -9,7 +9,7 @@ import {NgOptimizedImage} from '@angular/common';
   templateUrl: './home.html',
   styleUrls: ['./home.scss'],
 })
-export class Home implements OnInit {
+export class HomeComponent implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit(): void {}

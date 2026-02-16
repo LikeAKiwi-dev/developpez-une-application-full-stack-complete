@@ -42,7 +42,7 @@ describe('LoginComponent', () => {
     component.submit();
 
     expect(authMock.login).toHaveBeenCalled();
-    expect(routerMock.navigate).toHaveBeenCalledWith(['/topics']);
+    expect(routerMock.navigate).toHaveBeenCalledWith(['/feed']);
   });
 
   it('should set error message on login failure', () => {

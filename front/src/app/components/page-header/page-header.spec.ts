@@ -1,18 +1,24 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Location } from '@angular/common';
 
-import { Header } from './header';
+import { PageHeaderComponent } from './page-header';
 
-describe('Header', () => {
-  let component: Header;
-  let fixture: ComponentFixture<Header>;
+describe('PageHeaderComponent', () => {
+  let component: PageHeaderComponent;
+  let fixture: ComponentFixture<PageHeaderComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Header]
-    })
-    .compileComponents();
+      imports: [PageHeaderComponent],
+      providers: [
+        {
+          provide: Location,
+          useValue: { back: () => void 0 },
+        },
+      ],
+    }).compileComponents();
 
-    fixture = TestBed.createComponent(Header);
+    fixture = TestBed.createComponent(PageHeaderComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

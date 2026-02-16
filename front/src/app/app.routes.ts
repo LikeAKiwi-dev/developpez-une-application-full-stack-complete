@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { Home } from './pages/home/home';
+import { HomeComponent } from './pages/home/home';
 import { TopicsComponent } from './pages/topics/topics';
 import { LoginComponent } from './pages/login/login';
 import { FeedComponent } from './pages/feed/feed';
@@ -14,7 +14,7 @@ import { MeComponent } from './pages/me/me';
 
 export const routes: Routes = [
   { path: '',
-    component: Home,
+    component: HomeComponent,
     canActivate: [GuestGuard]
   },
   {
