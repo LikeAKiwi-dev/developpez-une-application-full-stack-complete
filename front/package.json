@@ -1,15 +1,21 @@
 {
-  "name": "front",
+  "name": "mdd-app",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "test:coverage": "ng test --coverage",
+
     "cypress:open": "cypress open",
-    "cypress:run": "cypress run"
+    "cypress:run": "cypress run",
+
+    "e2e": "cypress open",
+    "e2e:ci": "cypress run"
   },
+
+
   "prettier": {
     "printWidth": 100,
     "singleQuote": true,
