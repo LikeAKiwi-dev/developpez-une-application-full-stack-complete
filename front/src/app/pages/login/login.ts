@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import {Component, DestroyRef, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {ReactiveFormsModule, FormBuilder, Validators, FormGroup} from '@angular/forms';
 import { Router } from '@angular/router';
 import {AuthService, LoginRequest} from '../../services/auth.service';
 import {PageHeaderComponent} from '../../components/page-header/page-header';
 import {ToastService} from '../../shared/toast';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-login',
@@ -15,6 +16,8 @@ import {ToastService} from '../../shared/toast';
 export class LoginComponent {
   form!: FormGroup;
   error!: string;
+
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor(
     private fb: FormBuilder,
@@ -32,7 +35,9 @@ export class LoginComponent {
 
     const payload: LoginRequest = this.form.getRawValue();
 
-    this.auth.login(payload).subscribe({
+    this.auth.login(payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
       next: () => this.router.navigate(['/feed']),
       error: () => {
         this.error = 'Identifiants invalides (ou back non joignable).';

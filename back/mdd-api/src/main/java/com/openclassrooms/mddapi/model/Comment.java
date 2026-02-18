@@ -6,6 +6,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+/**
+ * Entité représentant un commentaire associé à un post.
+ *
+ * Relations :
+ * - ManyToOne avec Post
+ * - ManyToOne avec User
+ */
 
 @Entity
 @Table(name = "comments")

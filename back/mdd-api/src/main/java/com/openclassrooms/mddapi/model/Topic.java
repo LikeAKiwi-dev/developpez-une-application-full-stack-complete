@@ -7,6 +7,9 @@ import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
+/**
+ * Entité représentant un sujet auquel les utilisateurs peuvent s’abonner.
+ */
 
 @Entity
 @Table(name = "topics")

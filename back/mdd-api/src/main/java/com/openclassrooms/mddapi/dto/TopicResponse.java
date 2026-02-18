@@ -6,6 +6,9 @@ import lombok.Getter;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Flow;
+/**
+ * Réponse de listing des topics (structure retournée au front).
+ */
 
 @Getter
 @AllArgsConstructor

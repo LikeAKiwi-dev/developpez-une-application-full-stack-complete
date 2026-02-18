@@ -13,6 +13,10 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
 import java.util.List;
+/**
+ * Contrôleur REST lié à l'utilisateur connecté.
+ * Fournit les endpoints de lecture et de mise à jour du profil (/me).
+ */
 
 @RestController
 @RequestMapping("/api/users")
@@ -25,6 +29,12 @@ public class UserController {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
+    /**
+     * Retourne les informations du profil de l'utilisateur authentifié (et ses abonnements).
+     *
+     * @param auth contexte d'authentification (doit être présent)
+     * @return 200 avec le profil, ou 401 si non authentifié / utilisateur introuvable
+     */
 
     @GetMapping("/me")
     public ResponseEntity<UserMeResponse> me(Authentication auth) {
@@ -45,6 +55,14 @@ public class UserController {
                 subscriptions
         ));
     }
+    /**
+     * Met à jour le profil de l'utilisateur authentifié.
+     * Peut mettre à jour username, email et/ou mot de passe.
+     *
+     * @param req données de mise à jour validées
+     * @param auth contexte d'authentification (doit être présent)
+     * @return 200 avec le profil mis à jour, 401 si non authentifié, 409 si email/username déjà utilisé
+     */
 
     @PutMapping("/me")
     public ResponseEntity<UserMeResponse> updateMe(@Valid @RequestBody UpdateMeRequest req, Authentication auth) {

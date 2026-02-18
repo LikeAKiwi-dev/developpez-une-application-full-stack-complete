@@ -43,7 +43,7 @@ class AuthControllerIntegrationTest {
         RegisterRequest request = new RegisterRequest();
         request.setUsername("jordan");
         request.setEmail("jordan@test.com");
-        request.setPassword("password");
+        request.setPassword("Password1!");
 
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -58,12 +58,12 @@ class AuthControllerIntegrationTest {
         RegisterRequest request1 = new RegisterRequest();
         request1.setUsername("user1");
         request1.setEmail("duplicate@test.com");
-        request1.setPassword("password");
+        request1.setPassword("Password1!");
 
         RegisterRequest request2 = new RegisterRequest();
         request2.setUsername("user2");
         request2.setEmail("duplicate@test.com");
-        request2.setPassword("password");
+        request2.setPassword("Password1!");
 
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -82,12 +82,12 @@ class AuthControllerIntegrationTest {
         RegisterRequest request1 = new RegisterRequest();
         request1.setUsername("sameuser");
         request1.setEmail("sameuser1@test.com");
-        request1.setPassword("password");
+        request1.setPassword("Password1!");
 
         RegisterRequest request2 = new RegisterRequest();
         request2.setUsername("sameuser");
         request2.setEmail("sameuser2@test.com");
-        request2.setPassword("password");
+        request2.setPassword("Password1!");
 
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)

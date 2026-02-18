@@ -7,6 +7,14 @@ import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
+/**
+ * Entité représentant un utilisateur de l’application.
+ *
+ * Relations :
+ * - ManyToMany avec Topic (subscriptions)
+ * - OneToMany avec Post
+ * - OneToMany avec Comment
+ */
 
 @Entity
 @Table(name = "users")

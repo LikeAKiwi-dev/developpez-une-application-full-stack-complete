@@ -88,7 +88,7 @@ DB_PASSWORD=projet5_password
 Le script SQL de création est disponible dans :
 
 ```
-back/src/main/resources/schema.sql
+resources/schema.sql
 ```
 
 Créer la base de données avant le lancement du backend.
@@ -293,7 +293,7 @@ mvn verify
 Rapport disponible dans :
 
 ```
-back/target/site/jacoco/index.html
+back/mdd-api/target/site/jacoco/index.html
 ```
 
 Si le seuil minimum n’est pas atteint, la commande échoue automatiquement.

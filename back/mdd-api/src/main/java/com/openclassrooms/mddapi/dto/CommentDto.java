@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+/**
+ * DTO représentant un commentaire (données exposées au front).
+ */
 
 @Getter
 @AllArgsConstructor

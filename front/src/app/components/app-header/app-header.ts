@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import {Component, DestroyRef, inject} from '@angular/core';
 import {Router, RouterLink, NavigationEnd, RouterLinkActive} from '@angular/router';
 import {AsyncPipe, NgOptimizedImage} from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { filter } from 'rxjs/operators';
 import {Observable} from 'rxjs';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-app-header',
@@ -17,11 +18,15 @@ export class AppHeaderComponent {
   showHeader: boolean = true;
   isLoggedIn$!: Observable<boolean>;
 
+  private readonly destroyRef = inject(DestroyRef);
+
   constructor(private auth: AuthService, private router: Router) {
     this.isLoggedIn$ = this.auth.isLoggedIn$;
 
     this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
+      .pipe(
+        filter(event => event instanceof NavigationEnd),
+        takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.showHeader = this.router.url !== '/';
       });
@@ -36,7 +41,9 @@ export class AppHeaderComponent {
   }
 
   logout(): void {
-    this.auth.logout().subscribe(() => {
+    this.auth
+      .logout()
+      .pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.closeMenu();
       this.router.navigate(['/']);
     });

@@ -16,7 +16,12 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
-
+/**
+ * Service métier pour la gestion des posts.
+ * - Création d'un post
+ * - Récupération d'un post avec ses commentaires
+ * - Mapping entité -> DTO
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -27,6 +32,13 @@ public class PostService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
 
+    /**
+     * Crée un post au nom de l'utilisateur authentifié.
+     *
+     * @param username username issu du contexte de sécurité
+     * @param req payload de création du post
+     * @return DTO du post créé
+     */
     public PostDto create(String username, PostCreateRequest req) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
@@ -45,6 +57,12 @@ public class PostService {
         return toDto(saved);
     }
 
+    /**
+     * Retourne le détail d'un post (post + commentaires ordonnés par date).
+     *
+     * @param postId identifiant du post
+     * @return réponse détaillée
+     */
     @Transactional(readOnly = true)
     public PostDetailResponse getById(Long postId) {
         Post post = postRepository.findById(postId)
@@ -63,6 +81,12 @@ public class PostService {
         return new PostDetailResponse(toDto(post), comments);
     }
 
+    /**
+     * Convertit une entité {@link com.openclassrooms.mddapi.model.Post} en {@link com.openclassrooms.mddapi.dto.PostDto}.
+     *
+     * @param post entité Post
+     * @return DTO Post
+     */
     public PostDto toDto(Post post) {
         return new PostDto(
                 post.getId(),

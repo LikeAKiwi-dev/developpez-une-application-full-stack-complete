@@ -4,7 +4,6 @@ import { RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FeedService } from '../../services/feed.service';
 import { PostDto } from '../../models/post.model';
-import {PageHeaderComponent} from '../../components/page-header/page-header';
 import {ReactiveFormsModule} from '@angular/forms';
 import {ToastService} from '../../shared/toast';
 
@@ -17,8 +16,8 @@ import {ToastService} from '../../shared/toast';
 })
 export class FeedComponent {
   posts: PostDto[] = [];
-  sortDesc: Boolean = true;
-  sortAsc: Boolean = false;
+  sortDesc: boolean = true;
+  sortAsc: boolean = false;
 
   private readonly destroyRef = inject(DestroyRef);
 

@@ -16,6 +16,15 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 
+/**
+ * Service métier responsable de la gestion des commentaires.
+ *
+ * Responsabilités :
+ * - Ajout d’un commentaire sur un post existant
+ * - Association du commentaire à l’utilisateur authentifié
+ *
+ * Les opérations sont transactionnelles.
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -25,6 +34,14 @@ public class CommentService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
 
+    /**
+     * Crée un commentaire pour un post.
+     *
+     * @param username username de l’auteur
+     * @param postId identifiant du post
+     * @param req payload de création de commentaire
+     * @return commentaire créé (DTO)
+     */
     public CommentDto add(String username, Long postId, CommentCreateRequest req) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));

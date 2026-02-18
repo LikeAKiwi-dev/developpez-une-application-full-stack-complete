@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
+/**
+ * Réponse détaillée d'un post : post + liste des commentaires.
+ */
 
 @Getter
 @AllArgsConstructor

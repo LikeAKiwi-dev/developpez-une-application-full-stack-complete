@@ -6,6 +6,9 @@ import lombok.Setter;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+/**
+ * Payload d'inscription utilisateur.
+ */
 
 @Getter
 @Setter

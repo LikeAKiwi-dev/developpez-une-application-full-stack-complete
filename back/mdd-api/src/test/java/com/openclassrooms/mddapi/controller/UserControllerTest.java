@@ -122,11 +122,11 @@ class UserControllerTest {
         when(userRepository.findByUsername("alice")).thenReturn(Optional.of(current));
         when(userRepository.existsByUsername("bob")).thenReturn(false);
         when(userRepository.existsByEmail("b@b.com")).thenReturn(false);
-        when(passwordEncoder.encode("newpass")).thenReturn("HASH");
+        when(passwordEncoder.encode("Newpass1!")).thenReturn("HASH");
         when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
 
         String body = """
-            {"username":"bob","email":"b@b.com","password":"newpass"}
+            {"username":"bob","email":"b@b.com","password":"Newpass1!"}
             """;
 
         mvc.perform(put("/api/users/me")
@@ -137,7 +137,7 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.username").value("bob"))
                 .andExpect(jsonPath("$.email").value("b@b.com"));
 
-        verify(passwordEncoder).encode("newpass");
+        verify(passwordEncoder).encode("Newpass1!");
         verify(userRepository).save(any(User.class));
     }
 }

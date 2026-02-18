@@ -2,6 +2,9 @@ package com.openclassrooms.mddapi.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+/**
+ * DTO représentant un topic (données exposées au front).
+ */
 
 @Getter
 @AllArgsConstructor

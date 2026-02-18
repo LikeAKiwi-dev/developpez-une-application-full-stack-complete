@@ -6,6 +6,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+/**
+ * Entité représentant un utilisateur de l’application.
+ *
+ * Relations :
+ * - ManyToMany avec Topic (subscriptions)
+ * - OneToMany avec Post
+ * - OneToMany avec Comment
+ */
 
 @Entity
 @Table(name = "posts")

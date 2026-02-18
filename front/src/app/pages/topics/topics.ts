@@ -65,7 +65,10 @@ export class TopicsComponent {
   }
 
   subscribe(topicId: number): void {
-    this.subscriptionService.subscribe(topicId).subscribe({
+    this.subscriptionService
+      .subscribe(topicId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
       next: () => {
         this.successMsg = 'Abonnement effectué';
         this.loadTopics();
@@ -80,7 +83,10 @@ export class TopicsComponent {
 
 
   unsubscribe(topicId: number): void {
-    this.subscriptionService.unsubscribe(topicId).subscribe({
+    this.subscriptionService
+      .unsubscribe(topicId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
       next: () => {
         this.successMsg = 'Désabonnement effectué';
         this.loadTopics();
@@ -93,7 +99,10 @@ export class TopicsComponent {
   }
 
   protected logOut() {
-    this.authService.logout().subscribe({
+    this.authService
+      .logout()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
       next: () => window.location.href = '/',
       error: () => {
         this.error = 'Une erreur est survenue'

@@ -3,6 +3,10 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+/**
+ * Payload de mise à jour du profil utilisateur (/me).
+ * Les champs peuvent être partiels (optionnels).
+ */
 
 @Getter
 @Setter

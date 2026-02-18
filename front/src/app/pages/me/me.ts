@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import {Component, DestroyRef, inject, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import { finalize } from 'rxjs';
 import {UserMe} from '../../models/user-me.model';
@@ -7,6 +7,7 @@ import {UserService} from '../../services/user.service';
 import {SubscriptionService} from '../../services/subscription.service';
 import {AuthService} from '../../services/auth.service';
 import {ToastService} from '../../shared/toast';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-me',
@@ -21,6 +22,8 @@ export class MeComponent implements OnInit {
   saving = false;
   unsubscribingTopicId: number | null = null;
   form!: FormGroup;
+
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor(
     private readonly fb: FormBuilder,
@@ -45,7 +48,10 @@ export class MeComponent implements OnInit {
 
     this.userService
       .me()
-      .pipe(finalize(() => (this.loading = false)))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => (this.loading = false))
+      )
       .subscribe({
         next: (me) => {
           this.me = me;
@@ -89,7 +95,10 @@ export class MeComponent implements OnInit {
 
     this.userService
       .updateMe(payload)
-      .pipe(finalize(() => (this.saving = false)))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => (this.saving = false))
+      )
       .subscribe({
         next: (updated) => {
           this.me = updated;
@@ -107,7 +116,10 @@ export class MeComponent implements OnInit {
       });
   }
   protected logOut() {
-    this.authService.logout().subscribe({
+    this.authService
+      .logout()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
       next: () => window.location.href = '/',
       error: () => this.toast.info('Une erreur est survenue'),
     });
@@ -120,7 +132,9 @@ export class MeComponent implements OnInit {
 
     this.subscriptionService
       .unsubscribe(topicId)
-      .pipe(finalize(() => (this.unsubscribingTopicId = null)))
+      .pipe(takeUntilDestroyed(this.destroyRef),
+        finalize(() => (this.unsubscribingTopicId = null))
+      )
       .subscribe({
         next: () => this.fetchMe(),
         error: () => {

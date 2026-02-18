@@ -7,6 +7,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Contrôleur REST responsable de l’exposition des topics disponibles.
+ *
+ * Endpoint :
+ * - Récupération de la liste complète des topics
+ */
+
 @RestController
 @RequestMapping("/api/topics")
 public class TopicController {
@@ -17,6 +24,11 @@ public class TopicController {
         this.topicService = topicService;
     }
 
+    /**
+     * Retourne la liste des topics.
+     *
+     * @return liste des topics (format API)
+     */
     @GetMapping
     public List<TopicResponse> getAll() {
         return topicService.findAll()

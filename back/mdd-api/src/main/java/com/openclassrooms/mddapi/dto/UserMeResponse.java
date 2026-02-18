@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
+/**
+ * Réponse /me : informations de l'utilisateur connecté + abonnements.
+ */
 
 @Getter
 @AllArgsConstructor

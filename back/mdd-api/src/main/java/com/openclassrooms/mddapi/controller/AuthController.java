@@ -16,6 +16,15 @@ import jakarta.validation.Valid;
 
 import java.util.Map;
 
+/**
+ * Contrôleur REST responsable de l’authentification.
+ *
+ * Endpoints :
+ * - Inscription d’un utilisateur
+ * - Connexion utilisateur (génération JWT)
+ * - Récupération des informations de session (/me)
+ */
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -37,6 +46,12 @@ public class AuthController {
         this.jwtService = jwtService;
     }
 
+    /**
+     * Inscrit un nouvel utilisateur.
+     *
+     * @param req payload d’inscription validé
+     * @return réponse HTTP (succès ou erreur)
+     */
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest req) {
 
@@ -61,6 +76,12 @@ public class AuthController {
         ));
     }
 
+    /**
+     * Authentifie un utilisateur et retourne un JWT.
+     *
+     * @param req payload de connexion
+     * @return token JWT dans une map (clé/valeur)
+     */
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest req) {
         Authentication authentication = authenticationManager.authenticate(
@@ -75,6 +96,11 @@ public class AuthController {
         ));
     }
 
+    /**
+     * Déconnecte l’utilisateur (côté client, suppression du token).
+     *
+     * @return réponse HTTP confirmant la déconnexion
+     */
     @PostMapping("/logout")
     public ResponseEntity<Map<String, String>> logout() {
         return ResponseEntity.ok(Map.of(

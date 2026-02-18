@@ -14,6 +14,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Service métier responsable de la construction du feed utilisateur.
+ *
+ * Responsabilités :
+ * - Récupération des posts liés aux topics suivis par l’utilisateur
+ * - Tri des posts par date (ascendant ou descendant)
+ *
+ * Ne contient aucune logique de sécurité, celle-ci est gérée en amont.
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -23,6 +32,12 @@ public class FeedService {
     private final PostRepository postRepository;
     private final PostService postService;
 
+    /**
+     * Construit le feed (posts) de l’utilisateur.
+     *
+     * @param username username de l’utilisateur
+     * @return liste des posts (DTO)
+     */
     public List<PostDto> getFeed(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));

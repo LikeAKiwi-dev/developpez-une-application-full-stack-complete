@@ -20,6 +20,14 @@ import org.springframework.http.HttpStatus;
 
 
 import java.util.List;
+/**
+ * Configuration Spring Security de l'API.
+ * - Désactive CSRF (API stateless)
+ * - Active CORS
+ * - Met la session en STATELESS
+ * - Autorise /api/auth/** sans authentification
+ * - Protège les autres endpoints via JWT
+ */
 
 @Configuration
 public class SecurityConfig {
@@ -30,6 +38,13 @@ public class SecurityConfig {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
+    /**
+     * Déclare la chaîne de filtres Spring Security.
+     *
+     * @param http configuration HTTP Spring Security
+     * @return chaîne de filtres configurée
+     * @throws Exception en cas d’erreur de configuration
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -50,11 +65,23 @@ public class SecurityConfig {
 
         return http.build();
     }
+    /**
+     * Expose l'AuthenticationManager de Spring.
+     *
+     * @param config configuration d'authentification Spring
+     * @return l'AuthenticationManager
+     * @throws Exception en cas d'erreur
+     */
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
+    /**
+     * Source CORS utilisée par Spring Security.
+     *
+     * @return source de configuration CORS
+     */
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
