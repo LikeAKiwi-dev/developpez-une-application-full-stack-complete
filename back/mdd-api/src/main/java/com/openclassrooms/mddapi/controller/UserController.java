@@ -10,6 +10,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
+
 import java.util.List;
 
 @RestController
@@ -45,7 +47,7 @@ public class UserController {
     }
 
     @PutMapping("/me")
-    public ResponseEntity<UserMeResponse> updateMe(@RequestBody UpdateMeRequest req, Authentication auth) {
+    public ResponseEntity<UserMeResponse> updateMe(@Valid @RequestBody UpdateMeRequest req, Authentication auth) {
         if (auth == null) return ResponseEntity.status(401).build();
 
         User user = userRepository.findByUsername(auth.getName()).orElse(null);

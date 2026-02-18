@@ -6,6 +6,7 @@ import {UserMe} from '../../models/user-me.model';
 import {UserService} from '../../services/user.service';
 import {SubscriptionService} from '../../services/subscription.service';
 import {AuthService} from '../../services/auth.service';
+import {ToastService} from '../../shared/toast';
 
 @Component({
   selector: 'app-me',
@@ -16,13 +17,9 @@ import {AuthService} from '../../services/auth.service';
 })
 export class MeComponent implements OnInit {
   me:UserMe | null = null;
-
   loading = false;
   saving = false;
   unsubscribingTopicId: number | null = null;
-
-  errorMessage = '';
-  successMessage = '';
   form!: FormGroup;
 
   constructor(
@@ -30,6 +27,7 @@ export class MeComponent implements OnInit {
     private readonly userService: UserService,
     private readonly subscriptionService: SubscriptionService,
     private readonly authService: AuthService,
+    private toast: ToastService,
   ) {
     this.form = this.fb.group({
       username: ['', [Validators.required]],
@@ -44,8 +42,6 @@ export class MeComponent implements OnInit {
 
   fetchMe(): void {
     this.loading = true;
-    this.errorMessage = '';
-    this.successMessage = '';
 
     this.userService
       .me()
@@ -60,16 +56,13 @@ export class MeComponent implements OnInit {
           });
         },
         error: () => {
-          this.errorMessage = "Impossible de charger le profil. Vérifie que l'utilisateur est bien connecté.";
+          this.toast.info("Impossible de charger le profil. Vérifie que l'utilisateur est bien connecté.");
         },
       });
   }
 
   save(): void {
     if (!this.me) return;
-
-    this.errorMessage = '';
-    this.successMessage = '';
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -88,7 +81,7 @@ export class MeComponent implements OnInit {
 
 
     if (Object.keys(payload).length === 0) {
-      this.successMessage = 'Aucune modification à enregistrer.';
+      this.toast.info('Aucune modification à enregistrer.');
       return;
     }
 
@@ -101,30 +94,28 @@ export class MeComponent implements OnInit {
         next: (updated) => {
           this.me = updated;
           this.form.patchValue({ password: '' });
-          this.successMessage = 'Profil mis à jour.';
+          this.toast.info('Profil mis à jour.');
           this.logOut();
         },
         error: (err) => {
           if (err?.status === 409) {
-            this.errorMessage = "Ce nom d'utilisateur ou cet email est déjà utilisé.";
+            this.toast.info("Ce nom d'utilisateur ou cet email est déjà utilisé.");
             return;
           }
-          this.errorMessage = "Erreur lors de l'enregistrement du profil.";
+          this.toast.info("Erreur lors de l'enregistrement du profil.");
         },
       });
   }
   protected logOut() {
     this.authService.logout().subscribe({
       next: () => window.location.href = '/',
-      error: () => this.errorMessage = 'Une erreur est survenue',
+      error: () => this.toast.info('Une erreur est survenue'),
     });
   }
 
   unsubscribe(topicId: number): void {
     if (!this.me) return;
 
-    this.errorMessage = '';
-    this.successMessage = '';
     this.unsubscribingTopicId = topicId;
 
     this.subscriptionService
@@ -133,7 +124,7 @@ export class MeComponent implements OnInit {
       .subscribe({
         next: () => this.fetchMe(),
         error: () => {
-          this.errorMessage = "Impossible de se désabonner pour le moment.";
+          this.toast.info("Impossible de se désabonner pour le moment.");
         },
       });
   }

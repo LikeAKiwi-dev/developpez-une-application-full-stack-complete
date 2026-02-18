@@ -1,8 +1,6 @@
 <main class="container-fluid page">
   <section class="page-wrapper">
 
-    @if (error) { <p class="ui-error" role="alert">{{ error }}</p> }
-
     <nav class="action-bar">
       <button class="btn btn-primary" routerLink="/posts/new">Créer un article</button>
       <button type="button" class="link-btn action-right" (click)="toggleSort()">

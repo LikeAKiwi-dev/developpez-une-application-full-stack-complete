@@ -9,6 +9,7 @@ import { Topic } from '../../models/topic.model';
 import { UserMe } from '../../models/user-me.model';
 import { UserService } from '../../services/user.service';
 import {PageHeaderComponent} from '../../components/page-header/page-header';
+import {ToastService} from '../../shared/toast';
 
 @Component({
   selector: 'app-post-create',
@@ -18,9 +19,9 @@ import {PageHeaderComponent} from '../../components/page-header/page-header';
 })
 export class PostCreateComponent {
   topics: Topic[] = [];
-  error = '';
   currentUser!: UserMe;
   form!: FormGroup;
+  error!: string;
 
   private readonly destroyRef = inject(DestroyRef);
 
@@ -29,7 +30,8 @@ export class PostCreateComponent {
     private topicService: TopicService,
     private postService: PostService,
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    private toast: ToastService
   ) {
     this.form = this.fb.group({
       title: ['', [Validators.required, Validators.maxLength(150)]],
@@ -44,7 +46,10 @@ export class PostCreateComponent {
             this.currentUser = user;
             this.loadTopics();
           },
-          error: () => this.error = 'Utilisateur non connecté',
+          error: () => {
+            this.error = 'Utilisateur non connecté';
+            this.toast.info(this.error)
+          },
         });
 
   }
@@ -58,18 +63,21 @@ export class PostCreateComponent {
             t.subscribers.some(s => s.username === this.currentUser.username)
           );
         },
-        error: () => (this.error = 'Impossible de charger les topics.'),
+        error: () => {
+          this.error = 'Impossible de charger les topics.'
+          this.toast.info(this.error)
+        },
       });
   }
 
   submit(): void {
-    this.error = '';
     if (this.form.invalid) return;
 
     const payload: CreatePostRequest = this.form.getRawValue();
 
     if (payload.topicId === 0) {
-      this.error = 'Veuillez choisir un topic.';
+      this.error = 'Veuillez choisir un topic.'
+      this.toast.info(this.error);
       return;
     }
 
@@ -77,7 +85,10 @@ export class PostCreateComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => this.router.navigate(['/feed']),
-        error: () => (this.error = 'Création impossible (connecté ? topicId valide ?).'),
+        error: () => {
+          this.error = "Création impossible (connecté ? topicId valide ?)."
+          this.toast.info(this.error)
+        },
       });
   }
 }

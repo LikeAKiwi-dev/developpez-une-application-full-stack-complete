@@ -6,6 +6,7 @@ import { Topic } from '../../models/topic.model';
 import { UserMe } from '../../models/user-me.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../services/auth.service';
+import {ToastService} from '../../shared/toast';
 
 @Component({
   selector: 'app-topics',
@@ -16,8 +17,8 @@ import { AuthService } from '../../services/auth.service';
 export class TopicsComponent {
   topics: Topic[] = [];
   currentUser!: UserMe;
-  error = '';
-  successMsg = '';
+  error!: string;
+  successMsg:string =  '';
 
   private destroyRef = inject(DestroyRef);
 
@@ -25,7 +26,8 @@ export class TopicsComponent {
     private topicService: TopicService,
     private subscriptionService: SubscriptionService,
     private userService: UserService,
-    private authService: AuthService
+    private authService: AuthService,
+    private toast: ToastService
   ) {
     this.load();
   }
@@ -39,7 +41,10 @@ export class TopicsComponent {
           this.currentUser = user;
           this.loadTopics();
         },
-        error: () => this.error = 'Utilisateur non connecté',
+        error: () => {
+          this.error = 'Utilisateur non connecté'
+          this.toast.info(this.error)
+        } ,
       });
   }
 
@@ -48,7 +53,10 @@ export class TopicsComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: topics => this.topics = topics,
-        error: () => this.error = 'Impossible de charger les topics',
+        error: () => {
+          this.error = 'Impossible de charger les topics';
+          this.toast.info(this.error)
+        },
       });
   }
 
@@ -57,31 +65,40 @@ export class TopicsComponent {
   }
 
   subscribe(topicId: number): void {
-    this.successMsg = '';
     this.subscriptionService.subscribe(topicId).subscribe({
       next: () => {
         this.successMsg = 'Abonnement effectué';
         this.loadTopics();
       },
-      error: () => this.error = 'Impossible de s’abonner',
+      error: () => {
+        this.error = 'Impossible de s’abonner';
+        this.toast.info(this.error);
+        this.loadTopics();
+      },
     });
   }
 
+
   unsubscribe(topicId: number): void {
-    this.successMsg = '';
     this.subscriptionService.unsubscribe(topicId).subscribe({
       next: () => {
         this.successMsg = 'Désabonnement effectué';
         this.loadTopics();
       },
-      error: () => this.error = 'Impossible de se désabonner',
+      error: () => {
+        this.error = 'Impossible de se désabonner'
+        this.toast.info(this.error)
+      },
     });
   }
 
   protected logOut() {
     this.authService.logout().subscribe({
       next: () => window.location.href = '/',
-      error: () => this.error = 'Une erreur est survenue',
+      error: () => {
+        this.error = 'Une erreur est survenue'
+        this.toast.info(this.error)
+      },
     });
   }
 

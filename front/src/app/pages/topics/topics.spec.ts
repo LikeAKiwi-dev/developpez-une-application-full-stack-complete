@@ -28,7 +28,6 @@ describe('TopicsComponent', () => {
   ];
 
   const topicServiceMock = {
-    // IMPORTANT: async (microtask) pour éviter NG0100
     getAll: vi.fn(() => from(Promise.resolve(topicsMock))),
   };
 
@@ -38,7 +37,6 @@ describe('TopicsComponent', () => {
   };
 
   const userServiceMock = {
-    // IMPORTANT: async (microtask) pour éviter NG0100
     me: vi.fn(() => from(Promise.resolve(currentUserMock))),
     updateMe: vi.fn(() => of(currentUserMock)),
   };
@@ -63,13 +61,10 @@ describe('TopicsComponent', () => {
     fixture = TestBed.createComponent(TopicsComponent);
     component = fixture.componentInstance;
 
-    // 1) premier rendu
     fixture.detectChanges();
 
-    // 2) attendre les microtasks (Promise.resolve)
     await fixture.whenStable();
 
-    // 3) rendu avec données chargées
     fixture.detectChanges();
   });
 
@@ -93,7 +88,6 @@ describe('TopicsComponent', () => {
 
     expect(subscriptionServiceMock.subscribe).toHaveBeenCalledWith(1);
 
-    // laisse le refresh async se produire
     await fixture.whenStable();
     expect(topicServiceMock.getAll).toHaveBeenCalled();
   });

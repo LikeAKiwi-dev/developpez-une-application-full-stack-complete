@@ -4,6 +4,7 @@ import {ReactiveFormsModule, FormBuilder, Validators, FormGroup} from '@angular/
 import { Router } from '@angular/router';
 import {AuthService, LoginRequest} from '../../services/auth.service';
 import {PageHeaderComponent} from '../../components/page-header/page-header';
+import {ToastService} from '../../shared/toast';
 
 @Component({
   selector: 'app-login',
@@ -12,10 +13,14 @@ import {PageHeaderComponent} from '../../components/page-header/page-header';
   templateUrl: './login.html',
 })
 export class LoginComponent {
-  error: string = '';
   form!: FormGroup;
+  error!: string;
 
-  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private auth: AuthService,
+    private router: Router,
+    private toast: ToastService) {
     this.form = this.fb.group({
       login: ['', Validators.required],
       password: ['', Validators.required],
@@ -23,14 +28,16 @@ export class LoginComponent {
   }
 
   submit(): void {
-    this.error = '';
     if (this.form.invalid) return;
 
     const payload: LoginRequest = this.form.getRawValue();
 
     this.auth.login(payload).subscribe({
       next: () => this.router.navigate(['/feed']),
-      error: () => (this.error = 'Identifiants invalides (ou back non joignable).'),
+      error: () => {
+        this.error = 'Identifiants invalides (ou back non joignable).';
+        this.toast.info(this.error);
+      },
     });
   }
 }

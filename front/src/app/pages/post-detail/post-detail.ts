@@ -6,6 +6,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {CreateCommentRequest, PostService} from '../../services/post.service';
 import { PostDetailResponse } from '../../models/post.model';
 import {PageHeaderComponent} from '../../components/page-header/page-header';
+import {ToastService} from '../../shared/toast';
 
 @Component({
   selector: 'app-post-detail',
@@ -15,13 +16,16 @@ import {PageHeaderComponent} from '../../components/page-header/page-header';
 })
 export class PostDetailComponent {
   data?: PostDetailResponse;
-  error = '';
   private readonly destroyRef = inject(DestroyRef);
 
   commentForm!: FormGroup;
   private postId!: number;
 
-  constructor(private route: ActivatedRoute, private postService: PostService, private fb: FormBuilder) {
+  constructor(
+    private route: ActivatedRoute,
+    private postService: PostService,
+    private fb: FormBuilder,
+    private toast: ToastService) {
     this.commentForm = this.fb.group({
       content: ['', Validators.required],
     });
@@ -31,12 +35,11 @@ export class PostDetailComponent {
   }
 
   load(): void {
-    this.error = '';
     this.postService.getById(this.postId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (d) => (this.data = d),
-        error: () => (this.error = 'Post introuvable ou accès refusé.'),
+        error: () => (this.toast.info('Post introuvable ou accès refusé.')),
       });
   }
 
@@ -52,7 +55,7 @@ export class PostDetailComponent {
           this.commentForm.reset();
           this.load();
         },
-        error: () => (this.error = "Impossible d'ajouter le commentaire."),
+        error: () => (this.toast.info("Impossible d'ajouter le commentaire.")),
       });
   }
 }

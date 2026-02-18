@@ -6,6 +6,7 @@ import { FeedService } from '../../services/feed.service';
 import { PostDto } from '../../models/post.model';
 import {PageHeaderComponent} from '../../components/page-header/page-header';
 import {ReactiveFormsModule} from '@angular/forms';
+import {ToastService} from '../../shared/toast';
 
 @Component({
   selector: 'app-feed',
@@ -16,18 +17,19 @@ import {ReactiveFormsModule} from '@angular/forms';
 })
 export class FeedComponent {
   posts: PostDto[] = [];
-  error:String = '';
   sortDesc: Boolean = true;
   sortAsc: Boolean = false;
 
   private readonly destroyRef = inject(DestroyRef);
 
-  constructor(private feedService: FeedService) {
+  constructor(
+    private feedService: FeedService,
+    private toast: ToastService,) {
     this.feedService.getFeed()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => (this.posts = data),
-        error: () => (this.error = 'Impossible de charger le feed (êtes-vous connecté ?).'),
+        error: () => (this.toast.info('Impossible de charger le feed (êtes-vous connecté ?).')),
       });
   }
 
