@@ -12,7 +12,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.authentication.BadCredentialsException;
 
 import java.util.Map;
 
@@ -56,10 +58,10 @@ public class AuthController {
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest req) {
 
         if (userRepository.existsByEmail(req.email)) {
-            return ResponseEntity.status(409).body(Map.of("message", "Email already used"));
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already used");
         }
         if (userRepository.existsByUsername(req.username)) {
-            return ResponseEntity.status(409).body(Map.of("message", "Username already used"));
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already used");
         }
 
         User u = new User();
@@ -84,16 +86,20 @@ public class AuthController {
      */
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest req) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(req.login, req.password)
-        );
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(req.login, req.password)
+            );
 
-        String token = jwtService.generateToken(authentication.getName());
+            String token = jwtService.generateToken(authentication.getName());
 
-        return ResponseEntity.ok(Map.of(
-                "token", token,
-                "message", "Successful login"
-        ));
+            return ResponseEntity.ok(Map.of(
+                    "token", token,
+                    "message", "Successful login"
+            ));
+        } catch (BadCredentialsException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Identifiants invalides");
+        }
     }
 
     /**

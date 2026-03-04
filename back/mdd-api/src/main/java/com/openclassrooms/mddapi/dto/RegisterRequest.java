@@ -6,15 +6,19 @@ import lombok.Setter;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+
 /**
  * Payload d'inscription utilisateur.
  */
-
 @Getter
 @Setter
 @NoArgsConstructor
 public class RegisterRequest {
+
+    @NotBlank(message = "L'email est obligatoire")
     public String email;
+
+    @NotBlank(message = "Le nom d'utilisateur est obligatoire")
     public String username;
 
     @NotBlank(message = "Le mot de passe est obligatoire")
